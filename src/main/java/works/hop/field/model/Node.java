@@ -5,16 +5,19 @@ import java.util.List;
 
 public class Node {
 
-    String value;
-    Node parent;
-    List<Node> children = new LinkedList<>();
+    public String type;
+    public String name;
+    public String packageName;
+    public String items;
+    public List<Node> children = new LinkedList<>();
 
-    public Node(String value, Node parent) {
-        this.value = value;
-        this.parent = parent;
+    public Node(String type, String name, String packageName) {
+        this.type = type;
+        this.name = name;
+        this.packageName = packageName;
     }
 
-    public void child(Node child){
+    public void child(Node child) {
         this.children.add(child);
     }
 }
