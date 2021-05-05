@@ -4,15 +4,15 @@ import works.hop.field.jdbc.example.ItemC;
 
 public class FetchExample {
 
+    public static void main(String[] args) {
+
+    }
+
     static class ExampleCoupler implements FetchCoupler<ItemC, ItemC> {
 
         @Override
         public void fetch(FetchContext context, FetchProducer<ItemC> provider, FetchConsumer<ItemC> consumer) {
-            
+
         }
-    }
-
-    public static void main(String[] args) {
-
     }
 }

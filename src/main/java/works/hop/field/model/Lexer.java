@@ -14,25 +14,26 @@ public class Lexer {
 
     final static Logger log = LoggerFactory.getLogger(Lexer.class);
     final String input;
+    final Stack<Character> objectDepth = new Stack<>();
+    final Stack<Character> arrayDepth = new Stack<>();
+    final List<Token> tokens = new ArrayList<>();
     int current = 0;
     int lineNum = 1;
-    Stack<Character> objectDepth = new Stack<>();
-    Stack<Character> arrayDepth = new Stack<>();
-    Action action = Action.SEEK_NEXT;
-    List<Token> tokens = new ArrayList<>();
+    Action action = Action.READ_PROPERTY;
     Map<String, String> keywords = new HashMap<>() {
         {
-            put(NAMESPACE, "package");
-            put(DOC, "documentation");
-            put(FIELDS, "attributes");
+            put(NAMESPACE, "namespace");
+            put(DOC, "doc");
+            put(FIELDS, "fields");
             put(ALIASES, "aliases");
             put(DEFAULT, "default");
             put(VALUES, "values");
-            put(SYMBOLS, "enumeration");
+            put(SYMBOLS, "symbols");
             put(LOGICAL_TYPE, "logicalType");
             put(PRECISION, "precision");
             put(SCALE, "scale");
             put(TYPE, "type");
+            put(NAME, "name");
             put(NULL, "null");
             put(BOOLEAN, "boolean");
             put(INT, "int");
@@ -46,6 +47,7 @@ public class Lexer {
             put(ARRAY, "array");
             put(MAP, "map");
             put(FIXED, "fixed");
+            put(COMMENT, "comment");
         }
     };
 
@@ -64,9 +66,13 @@ public class Lexer {
     }
 
     public static void main(String[] args) {
-        Lexer gen = new Lexer("/model/user.avsc");
+        Lexer gen = new Lexer("/model/ex1.avsc");
         gen.parse();
         System.out.println(gen.tokens);
+    }
+
+    public List<Token> getTokens() {
+        return tokens;
     }
 
     public void parse() {
@@ -75,9 +81,11 @@ public class Lexer {
             switch (ch) {
                 case '{':
                     startObject(ch);
+                    action = Action.READ_PROPERTY;
                     break;
                 case '}':
                     endObject();
+                    action = Action.SEEK_NEXT;
                     break;
                 case '[':
                     startArray(ch);
@@ -90,13 +98,20 @@ public class Lexer {
                     break;
                 case ':':
                     keyValueSeparator();
+                    action = Action.SEEK_NEXT;
                     break;
                 case ',':
                     attributeSeparator();
+                    action = Action.READ_PROPERTY;
                     break;
                 case '\n':
                 case '\r':
                     lineNum += 1;
+                    break;
+                case '/':
+                    if (input.charAt(current + 1) == '/') {
+                        startComment();
+                    }
                     break;
                 case ' ':
                 default:
@@ -112,8 +127,14 @@ public class Lexer {
         }
     }
 
+    public void startComment() {
+        current++;
+        while (input.charAt(current) != '\n') {
+            current++;
+        }
+    }
+
     public void keyValueSeparator() {
-        action = Action.READ_VALUE;
         tokens.add(new Token(current, ":", KEY_VALUE_SEP));
     }
 
@@ -136,7 +157,6 @@ public class Lexer {
 
     public void startObject(char ch) {
         objectDepth.add(ch);
-        action = Action.READ_PROPERTY;
         tokens.add(new Token(current, "{", START_OBJECT));
     }
 
@@ -163,8 +183,8 @@ public class Lexer {
         }
         String value = input.substring(start, current);
         Token reserved = reserved(start, value);
-        tokens.add(Objects.requireNonNullElseGet(reserved, () ->
-                new Token(start, input.substring(start, current), action == Action.READ_PROPERTY ? FIELD_NAME : STRING)));
+        tokens.add(Objects.requireNonNullElseGet(reserved,
+                () -> new Token(start, input.substring(start, current), STRING)));
         action = Action.SEEK_NEXT;
     }
 
@@ -179,6 +199,6 @@ public class Lexer {
         return current >= input.length();
     }
 
-    enum Action {SEEK_NEXT, READ_PROPERTY, READ_VALUE}
+    enum Action {SEEK_NEXT, READ_PROPERTY}
 
 }

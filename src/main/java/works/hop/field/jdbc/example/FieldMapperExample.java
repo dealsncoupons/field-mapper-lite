@@ -6,8 +6,8 @@ import works.hop.field.jdbc.mapper.BuilderFunction;
 import works.hop.field.jdbc.mapper.MapperBuilder;
 import works.hop.field.jdbc.mapper.MapperContext;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.List;
+import java.util.Map;
 
 import static works.hop.field.jdbc.mapper.MapperUtils.mapAToB;
 import static works.hop.field.jdbc.mapper.MapperUtils.setAToB;
@@ -46,12 +46,12 @@ public class FieldMapperExample {
     public static void copyToInstanceOfMatchingFieldTypes() {
         ItemA itemA = createTestItemA();
         MapperContext context = MapperBuilder.newBuilder("")
-        .mapAToB("cItem", "cTask")
-        .mapAToB("cItemList", "cTaskList")
-        .mapAToB("itemC", "taskC")
-        .mapAToB("cItemMap", "cTaskMap")
-        .mapAToB("cIntMap", "cIntMap")
-        .build();
+                .mapAToB("cItem", "cTask")
+                .mapAToB("cItemList", "cTaskList")
+                .mapAToB("itemC", "taskC")
+                .mapAToB("cItemMap", "cTaskMap")
+                .mapAToB("cIntMap", "cIntMap")
+                .build();
 
         TaskA clone = mapAToB(itemA, TaskA.class, context);
         System.out.println(clone);
@@ -76,7 +76,7 @@ public class FieldMapperExample {
                 .mapAToB("cItemMap", "gTaskMap", cItemContext)
                 .mapAToB("cIntMap", "gTaskSet")
                 .mapAToB("cIntMap", "gTaskSet", cItemContext)
-                .mapAToBResolver("cIntMap", "gTaskSet", input -> ((Map)input).keySet())
+                .mapAToBResolver("cIntMap", "gTaskSet", input -> ((Map) input).keySet())
                 .build();
 
         TaskE clone = setAToB(itemA, TaskE.class, context);
