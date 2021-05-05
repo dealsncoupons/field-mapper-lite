@@ -1,0 +1,2 @@
+start postgres server: docker run --rm -dit --name local_postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 debezium/postgres
+start postgres client: docker run -it --rm --link local_postgres postgres psql -U postgres -h local_postgres
