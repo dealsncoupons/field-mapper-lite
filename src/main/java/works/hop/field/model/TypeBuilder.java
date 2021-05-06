@@ -9,6 +9,8 @@ public interface TypeBuilder<T> {
         return LoggerFactory.getLogger(TypeBuilder.class);
     }
 
+    String qualifiedName();
+
     TypeBuilder<T> name(String name);
 
     TypeBuilder<T> value(String value);

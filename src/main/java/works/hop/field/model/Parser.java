@@ -1,9 +1,7 @@
 package works.hop.field.model;
 
-import works.hop.field.model.builder.ArrayTypeBuilder;
-import works.hop.field.model.builder.EnumTypeBuilder;
-import works.hop.field.model.builder.FieldTypeBuilder;
-import works.hop.field.model.builder.RecordTypeBuilder;
+import works.hop.field.model.builder.*;
+import works.hop.field.model.generator.Generator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +72,7 @@ public class Parser {
     final List<String> primitiveTypes = List.of("null", "boolean", "int", "long", "float", "double", "bytes", "string");
     final List<String> complexTypes = List.of("record", "array", "enum", "map", "fixed");
     final List<Node> nodesBuilt = new ArrayList<>();
+    final List<String> generatedTypes = new ArrayList<>();
     int current = 0;
 
     public Parser(List<Token> tokens) {
@@ -81,6 +80,17 @@ public class Parser {
             throw new RuntimeException("Parser cannot function without tokens");
         }
         this.tokens.addAll(tokens);
+    }
+
+    public static void main(String[] args) {
+        Lexer gen = new Lexer("/model/ex3.avsc");
+        gen.parse();
+
+        Parser parser = new Parser(gen.getTokens());
+        parser.parse();
+
+        Generator generator = new Generator(parser.getNodesBuilt().get(0));
+        generator.generate();
     }
 
     public List<Node> getNodesBuilt() {
@@ -361,10 +371,17 @@ public class Parser {
     public void unionDefinition() {
         //startArray() string()+ endArray()
         startArray();
+        UnionTypeBuilder unionTypeBuilder = new UnionTypeBuilder();
+        builderStack.add(unionTypeBuilder);
         current++;
         while (!tokens.get(current).type.equals(END_ARRAY)) {
             string();
+            unionTypeBuilder.add(tokens.get(current).value);
             current++;
+            if (tokens.get(current).type.equals(ATTRIBUTE_SEP)) {
+                attributeSep();
+                current++;
+            }
         }
         endArray();
     }
@@ -441,10 +458,12 @@ public class Parser {
         Token next = tokens.get(current);
         if (next.type.equals(START_ARRAY)) {
             unionDefinition();
+            UnionTypeBuilder unionTypes = (UnionTypeBuilder) builderStack.pop();
+            builderStack.peek().type(unionTypes.build().type);
         } else {
             string();
+            builderStack.peek().type(tokens.get(current).value);
         }
-        builderStack.peek().type(tokens.get(current).value);
     }
 
     public void itemsProperty() {
@@ -509,7 +528,6 @@ public class Parser {
         attributeSep();
         current++;
         typeProperty();
-        fieldBuilder.type(tokens.get(current).value);
         current++;
         endObject();
     }
@@ -570,6 +588,7 @@ public class Parser {
                     current++;
                     break;
                 case FIELDS:
+                    generatedTypes.add(recordBuilder.qualifiedName()); //allows using this type as a field type
                     fieldsProperty();
                     current++;
                     break;
@@ -591,6 +610,6 @@ public class Parser {
             token = tokens.get(current);
         }
         endObject();
-        nodesBuilt.add((Node) builderStack.pop().build());
+        this.nodesBuilt.add((Node) builderStack.pop().build());
     }
 }

@@ -13,6 +13,13 @@ public abstract class AbstractTypeBuilder<T> implements TypeBuilder<T> {
     protected String defaultValue;
 
     @Override
+    public String qualifiedName() {
+        return namespace != null?
+                namespace + "." + name :
+                name;
+    }
+
+    @Override
     public AbstractTypeBuilder<T> name(String name) {
         this.name = name;
         return this;

@@ -1,9 +1,7 @@
 package works.hop.field.model.generator;
 
 import com.squareup.javapoet.*;
-import works.hop.field.model.Lexer;
 import works.hop.field.model.Node;
-import works.hop.field.model.Parser;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
@@ -13,9 +11,9 @@ import java.util.Map;
 
 public class Generator {
 
-    Node node;
-    String destDir = "build/generated/sources/";
-    Map<String, TypeName> typeMap = new HashMap<>() {
+    final Node node;
+    final String destDir = "build/generated/sources/";
+    final Map<String, TypeName> typeMap = new HashMap<>() {
         {
             put("null", null);
             put("boolean", TypeName.BOOLEAN);
@@ -32,15 +30,16 @@ public class Generator {
         this.node = node;
     }
 
-    public static void main(String[] args) {
-        Lexer gen = new Lexer("/model/ex2.avsc");
-        gen.parse();
-
-        Parser parser = new Parser(gen.getTokens());
-        parser.parse();
-
-        Generator generator = new Generator(parser.getNodesBuilt().get(0));
-        generator.generate();
+    public TypeName typeName(String type) {
+        if (typeMap.containsKey(type)) {
+            return typeMap.get(type);
+        } else {
+            try {
+                return TypeName.get(Class.forName(type));
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("You need to define generate the type '" + type + "' first before using it", e);
+            }
+        }
     }
 
     public void generate() {
@@ -56,7 +55,7 @@ public class Generator {
         for (Node child : node.children) {
             //add instance field
             FieldSpec fieldSpec = FieldSpec.builder(
-                    typeMap.get(child.type),
+                    typeName(child.type),
                     child.name,
                     Modifier.PROTECTED)
                     .build();
@@ -66,7 +65,7 @@ public class Generator {
             MethodSpec setter = MethodSpec.methodBuilder("set" + capitalize(child.name))
                     .returns(TypeName.VOID)
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(typeMap.get(child.type), child.name)
+                    .addParameter(typeName(child.type), child.name)
                     .addStatement(String.format("this.%s = %s", child.name, child.name))
                     .build();
             builder.addMethod(setter);
@@ -74,7 +73,7 @@ public class Generator {
             //add getter
             MethodSpec getter = MethodSpec.methodBuilder("set" + capitalize(child.name))
                     .addModifiers(Modifier.PUBLIC)
-                    .returns(typeMap.get(child.type))
+                    .returns(typeName(child.type))
                     .addStatement(String.format("return this.%s", child.name))
                     .build();
             builder.addMethod(getter);
@@ -93,7 +92,7 @@ public class Generator {
         }
     }
 
-    public String capitalize(String input){
+    public String capitalize(String input) {
         return String.format("%s%s", Character.toUpperCase(input.charAt(0)),
                 input.substring(1));
     }

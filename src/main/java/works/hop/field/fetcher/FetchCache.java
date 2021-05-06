@@ -1,4 +1,4 @@
-package works.hop.field.data.fetcher;
+package works.hop.field.fetcher;
 
 import java.util.HashMap;
 

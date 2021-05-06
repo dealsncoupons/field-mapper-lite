@@ -8,7 +8,6 @@ public class Node {
     public String type;
     public String name;
     public String packageName;
-    public String items;
     public List<Node> children = new LinkedList<>();
 
     public Node(String type, String name, String packageName) {

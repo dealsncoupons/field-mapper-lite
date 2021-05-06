@@ -1,4 +1,4 @@
-package works.hop.field.data.fetcher;
+package works.hop.field.fetcher;
 
 public interface FetchContext {
 

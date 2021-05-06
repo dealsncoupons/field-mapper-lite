@@ -1,6 +1,6 @@
-package works.hop.field.data.fetcher.impl;
+package works.hop.field.fetcher.impl;
 
-import works.hop.field.data.fetcher.FetchConsumer;
+import works.hop.field.fetcher.FetchConsumer;
 
 import java.util.function.Consumer;
 
