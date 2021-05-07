@@ -19,6 +19,8 @@ public class FieldTypeBuilder extends AbstractTypeBuilder<Node> {
     @Override
     public Node build() {
         Node node = new Node(type, name);
+        node.values = values;
+        node.items = items;
         node.annotations.addAll(this.annotations);
         return node;
     }

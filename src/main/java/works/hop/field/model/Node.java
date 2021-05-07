@@ -11,8 +11,10 @@ public class Node {
     public String type;
     public String name;
     public String packageName;
+    public String items;    //list item types
+    public String values;   //map value types
+    public List<String> symbols = new LinkedList<>(); //for enum types
     public List<Node> children = new LinkedList<>();
-    public List<String> symbols = new LinkedList<>();
     public List<String> annotations = new LinkedList<>();
 
     public Node(String type, String name) {

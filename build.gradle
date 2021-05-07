@@ -1,3 +1,9 @@
+buildscript {
+    ext {
+        generatedSources = "${buildDir}/generated/sources/"
+    }
+}
+
 plugins {
     id 'java'
 }
@@ -24,4 +30,12 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+sourceSets {
+    generated {
+        java.srcDirs "${generatedSources}"
+    }
+    // set up a dependency for the main sourceSet on the generated sourceSet
+    main.compileClasspath += generated.output
 }

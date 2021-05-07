@@ -19,17 +19,15 @@ public interface TypeBuilder<T> {
 
     TypeBuilder<T> type(String type);
 
-    TypeBuilder<T> add(Node value);
+    TypeBuilder<T> add(Node node);
 
-    TypeBuilder<T> add(String value);
+    TypeBuilder<T> add(String symbol);
 
     TypeBuilder<T> annotation(String annotations);
 
     TypeBuilder<T> items(String items);
 
-    TypeBuilder<T> size(int size);
-
-    TypeBuilder<T> defaultValue(String defaultValue);
+    TypeBuilder<T> values(String values);
 
     T build();
 }

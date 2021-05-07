@@ -10,8 +10,8 @@ public class EnumTypeBuilder extends AbstractTypeBuilder<Node> {
     private List<String> enumSymbols = new ArrayList<>();
 
     @Override
-    public AbstractTypeBuilder<Node> add(String value) {
-        this.enumSymbols.add(value);
+    public AbstractTypeBuilder<Node> add(String symbol) {
+        this.enumSymbols.add(symbol);
         return this;
     }
 

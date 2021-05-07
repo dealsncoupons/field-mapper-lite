@@ -5,6 +5,7 @@ import works.hop.field.model.builder.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import static works.hop.field.model.TokenType.*;
 
@@ -30,14 +31,29 @@ public class Parser {
         Parser parser = new Parser(gen.getTokens());
         parser.parse();
 
+        List<String> extraTypes = parser.getReadyList().stream().map(node ->
+                parser.qualifiedTypeName(node.packageName, node.name)).collect(Collectors.toList());
         for (Node node : parser.getReadyList()) {
-            Generator generator = new Generator(node);
+            Generator generator = new Generator(node, extraTypes);
             generator.generate();
         }
     }
 
     public List<Node> getReadyList() {
         return readyList;
+    }
+
+    public String qualifiedTypeName(String namespace, String typeName) {
+        if (namespace != null) {
+            if (typeName != null) {
+                return String.format("%s.%s", namespace, typeName);
+            }
+        } else {
+            if (typeName != null) {
+                return typeName;
+            }
+        }
+        throw new RuntimeException("Expected a type name to derive the qualified type name");
     }
 
     public void parse() {
@@ -256,15 +272,16 @@ public class Parser {
         current++;
         typeAttribute();
         current++;
+        keyValueSep();
+        current++;
         arrayType();
         ArrayTypeBuilder arrayBuilder = new ArrayTypeBuilder();
         builderStack.add(arrayBuilder);
         arrayBuilder.type(tokens.get(current).type);
         current++;
         attributeSep();
+        current++;
         itemsProperty();
-        ArrayTypeBuilder builder = (ArrayTypeBuilder) builderStack.pop();
-        //??? NOT YET HANDLED
         endObject();
     }
 
@@ -273,15 +290,16 @@ public class Parser {
         current++;
         typeAttribute();
         current++;
+        keyValueSep();
+        current++;
         mapType();
         MapTypeBuilder mapTypeBuilder = new MapTypeBuilder();
         builderStack.add(mapTypeBuilder);
         mapTypeBuilder.type(tokens.get(current).type);
         current++;
         attributeSep();
+        current++;
         valuesProperty();
-        MapTypeBuilder builder = (MapTypeBuilder) builderStack.pop();
-        //??? NOT YET HANDLED
         endObject();
     }
 
@@ -342,7 +360,7 @@ public class Parser {
             builderStack.peek().type(unionTypes.build().type);
         } else if (next.type.equals(START_OBJECT)) {
             //figure out whether to handle 'record', 'array' or 'map' type
-            List<String> permissible = List.of(RECORD, ARRAY, MAP);
+            List<String> permissible = List.of(RECORD, ARRAY, MAP, ENUM);
             int index = current;
             while (index < tokens.size() && !permissible.contains(tokens.get(index).value)) {
                 index++;
@@ -354,18 +372,34 @@ public class Parser {
                 case RECORD:
                     recordDefinition();
                     RecordTypeBuilder recordBuilder = (RecordTypeBuilder) builderStack.pop();
-                    Node record = recordBuilder.build();
-                    String recordType = String.format("%s.%s", record.packageName != null ? record.packageName : namespace, record.name);
+                    Node recordNode = recordBuilder.build();
+                    String recordType = qualifiedTypeName(recordNode.packageName != null ? recordNode.packageName : namespace, recordNode.name);
                     builderStack.peek().type(recordType);
-                    this.readyList.add(record);
+                    this.readyList.add(recordNode);
                     break;
                 case MAP:
                     mapDefinition();
-                    //??? NOT YET HANDLED - to be completed. Define map signature
+                    MapTypeBuilder mapBuilder = (MapTypeBuilder) builderStack.pop();
+                    Node mapNode = mapBuilder.build();
+                    String mapType = qualifiedTypeName(mapNode.packageName != null ? mapNode.packageName : namespace, mapNode.values);
+                    builderStack.peek().type(mapNode.name);
+                    builderStack.peek().values(mapType);
                     break;
                 case ARRAY:
                     arrayDefinition();
-                    //??? NOT YET HANDLED - to be completed. Define collection signature
+                    ArrayTypeBuilder arrayBuilder = (ArrayTypeBuilder) builderStack.pop();
+                    Node arrayNode = arrayBuilder.build();
+                    String arrayType = qualifiedTypeName(arrayNode.packageName != null ? arrayNode.packageName : namespace, arrayNode.items);
+                    builderStack.peek().type(arrayNode.name);
+                    builderStack.peek().items(arrayType);
+                    break;
+                case ENUM:
+                    enumDefinition();
+                    EnumTypeBuilder enumBuilder = (EnumTypeBuilder) builderStack.pop();
+                    Node enumNode = enumBuilder.build();
+                    String enumType = qualifiedTypeName(enumNode.packageName != null ? enumNode.packageName : namespace, enumNode.name);
+                    builderStack.peek().type(enumType);
+                    this.readyList.add(enumNode);
                     break;
                 default:
                     throw new RuntimeException("Encountered type '" + typeToHandle + "' which is not handled (yet)");
@@ -401,8 +435,17 @@ public class Parser {
         current++;
         keyValueSep();
         current++;
-        string();
-        builderStack.peek().items(tokens.get(current).value);
+        if (tokens.get(current).type.equals(START_OBJECT)) {
+            recordDefinition();
+            RecordTypeBuilder recordBuilder = (RecordTypeBuilder) builderStack.pop();
+            Node record = recordBuilder.build();
+            String recordType = qualifiedTypeName(record.packageName != null ? record.packageName : namespace, record.name);
+            builderStack.peek().items(recordType);
+            this.readyList.add(record);
+        } else {
+            string();
+            builderStack.peek().items(tokens.get(current).value);
+        }
         current++;
         if (tokens.get(current).type.equals(ATTRIBUTE_SEP)) {
             attributeSep();
@@ -415,8 +458,17 @@ public class Parser {
         current++;
         keyValueSep();
         current++;
-        string();
-        builderStack.peek().items(tokens.get(current).value);
+        if (tokens.get(current).type.equals(START_OBJECT)) {
+            recordDefinition();
+            RecordTypeBuilder recordBuilder = (RecordTypeBuilder) builderStack.pop();
+            Node record = recordBuilder.build();
+            String recordType = qualifiedTypeName(record.packageName != null ? record.packageName : namespace, record.name);
+            builderStack.peek().values(recordType);
+            this.readyList.add(record);
+        } else {
+            string();
+            builderStack.peek().values(tokens.get(current).value);
+        }
         current++;
         if (tokens.get(current).type.equals(ATTRIBUTE_SEP)) {
             attributeSep();

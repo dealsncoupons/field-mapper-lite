@@ -20,10 +20,31 @@
     },
     // optional next element
     {
+      "name": "myEnum",
+      "type": {
+        "type": "enum",
+        "name": "MyEnum",
+        "symbols": [
+          "B1",
+          "F1",
+          "F13"
+        ]
+      }
+    },
+    {
       "name": "mylist",
       "type": {
         "type": "array",
-        "items": "string"
+        "items": {
+          "type": "record",
+          "name": "MyListClass",
+          "fields": [
+            {
+              "type": "int",
+              "name": "count"
+            }
+          ]
+        }
       }
     },
     //list of strings
@@ -31,7 +52,7 @@
       "name": "mymap",
       "type": {
         "type": "map",
-        "values": "long"
+        "values": "Float"
       }
     }
     //map of <string, long>

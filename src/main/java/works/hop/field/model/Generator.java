@@ -13,6 +13,9 @@ import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static works.hop.field.model.TokenType.ARRAY;
+import static works.hop.field.model.TokenType.MAP;
+
 public class Generator {
 
     final Node node;
@@ -30,18 +33,14 @@ public class Generator {
         }
     };
 
-    public Generator(Node node) {
+    public Generator(Node node, List<String> additionalTypes) {
         this.node = node;
-    }
-
-    public TypeName typeName(String type) {
-        if (typeMap.containsKey(type)) {
-            return typeMap.get(type);
-        } else {
-            String packageName = type.substring(type.lastIndexOf("."));
-            String simpleName = type.substring(type.lastIndexOf(".") + 1);
-            return ClassName.get(packageName, simpleName);
+        Map<String, TypeName> extraTypes = new HashMap<>();
+        for (String type : additionalTypes) {
+            String[] splitType = splitQualifiedName(type);
+            extraTypes.put(type, ClassName.get(splitType[0], splitType[1]));
         }
+        this.typeMap.putAll(extraTypes);
     }
 
     public void generate() {
@@ -57,16 +56,13 @@ public class Generator {
         List<AnnotationSpec> classAnnotations = new ArrayList<>();
         for (String annotationValue : node.annotations) {
             String annotationName = annotationValue.substring(0, annotationValue.indexOf("("));
-            try {
-                AnnotationSpec.Builder annotationBuilder = AnnotationSpec.builder(Class.forName(annotationName));
-                addMembers().accept(annotationValue, annotationBuilder);
-                AnnotationSpec annotationSpec = annotationBuilder
-                        .build();
-                classAnnotations.add(annotationSpec);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Could not find the '" + annotationName + "' annotation");
-            }
+            String[] splitType = splitQualifiedName(annotationName);
+            AnnotationSpec.Builder annotationBuilder = AnnotationSpec.builder(
+                    ClassName.get(splitType[0], splitType[1]));
+            addMembers().accept(annotationValue, annotationBuilder);
+            AnnotationSpec annotationSpec = annotationBuilder
+                    .build();
+            classAnnotations.add(annotationSpec);
         }
         TypeSpec.Builder builder = TypeSpec.classBuilder(node.name)
                 .addAnnotations(classAnnotations)
@@ -78,46 +74,38 @@ public class Generator {
                 .build();
         builder.addMethod(defaultConstructor);
 
-        for (Node child : node.children) {
+        for (Node fieldNode : node.children) {
             //field annotations
             List<AnnotationSpec> fieldAnnotations = new ArrayList<>();
-            for (String annotationValue : child.annotations) {
+            for (String annotationValue : fieldNode.annotations) {
                 String annotationName = substring(annotationValue, 0, annotationValue.indexOf("("));
-                try {
-                    AnnotationSpec.Builder annotationBuilder = AnnotationSpec.builder(Class.forName(annotationName));
-                    addMembers().accept(annotationValue, annotationBuilder);
-                    AnnotationSpec annotationSpec = annotationBuilder
-                            .build();
-                    fieldAnnotations.add(annotationSpec);
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                    throw new RuntimeException("Could not find the '" + annotationName + "' annotation");
-                }
+                String[] splitType = splitQualifiedName(annotationName);
+                AnnotationSpec.Builder annotationBuilder = AnnotationSpec.builder(
+                        ClassName.get(splitType[0], splitType[1]));
+                addMembers().accept(annotationValue, annotationBuilder);
+                AnnotationSpec annotationSpec = annotationBuilder
+                        .build();
+                fieldAnnotations.add(annotationSpec);
             }
 
             //add instance field
-            FieldSpec fieldSpec = FieldSpec.builder(
-                    typeName(child.type),
-                    child.name,
-                    Modifier.PROTECTED)
-                    .addAnnotations(fieldAnnotations)
-                    .build();
+            FieldSpec fieldSpec = createFieldSpec(fieldNode, fieldAnnotations);
             builder.addField(fieldSpec);
 
             //add setter
-            MethodSpec setter = MethodSpec.methodBuilder("set" + capitalize(child.name))
+            MethodSpec setter = MethodSpec.methodBuilder("set" + capitalize(fieldNode.name))
                     .returns(TypeName.VOID)
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(typeName(child.type), child.name)
-                    .addStatement("this.$L = $L", child.name, child.name)
+                    .addParameter(createFieldType(fieldNode), fieldNode.name)
+                    .addStatement("this.$L = $L", fieldNode.name, fieldNode.name)
                     .build();
             builder.addMethod(setter);
 
             //add getter
-            MethodSpec getter = MethodSpec.methodBuilder("set" + capitalize(child.name))
+            MethodSpec getter = MethodSpec.methodBuilder("set" + capitalize(fieldNode.name))
                     .addModifiers(Modifier.PUBLIC)
-                    .returns(typeName(child.type))
-                    .addStatement("return this.$L", child.name)
+                    .returns(createFieldType(fieldNode))
+                    .addStatement("return this.$L", fieldNode.name)
                     .build();
             builder.addMethod(getter);
         }
@@ -159,7 +147,52 @@ public class Generator {
         }
     }
 
-    public BiConsumer<String, AnnotationSpec.Builder> addMembers() {
+    private TypeName createFieldType(Node fieldNode) {
+        switch (fieldNode.type) {
+            case ARRAY:
+                ClassName list = ClassName.get(List.class);
+                return ParameterizedTypeName.get(list, typeName(fieldNode.items));
+            case MAP:
+                TypeName string = ClassName.get(String.class);
+                ClassName map = ClassName.get(Map.class);
+                return ParameterizedTypeName.get(map, string, typeName(fieldNode.values));
+            default:
+                return typeName(fieldNode.type);
+        }
+    }
+
+    private FieldSpec createFieldSpec(Node fieldNode, List<AnnotationSpec> fieldAnnotations) {
+        switch (fieldNode.type) {
+            case ARRAY:
+                ClassName list = ClassName.get(List.class);
+                TypeName listType = ParameterizedTypeName.get(list, typeName(fieldNode.items));
+                return FieldSpec.builder(
+                        listType,
+                        fieldNode.name,
+                        Modifier.PROTECTED)
+                        .addAnnotations(fieldAnnotations)
+                        .build();
+            case MAP:
+                TypeName string = ClassName.get(String.class);
+                ClassName map = ClassName.get(Map.class);
+                TypeName mapType = ParameterizedTypeName.get(map, string, typeName(fieldNode.values));
+                return FieldSpec.builder(
+                        mapType,
+                        fieldNode.name,
+                        Modifier.PROTECTED)
+                        .addAnnotations(fieldAnnotations)
+                        .build();
+            default:
+                return FieldSpec.builder(
+                        typeName(fieldNode.type),
+                        fieldNode.name,
+                        Modifier.PROTECTED)
+                        .addAnnotations(fieldAnnotations)
+                        .build();
+        }
+    }
+
+    private BiConsumer<String, AnnotationSpec.Builder> addMembers() {
         return (String annotationValue, AnnotationSpec.Builder annotationBuilder) -> {
             if (annotationValue.contains("(")) {
                 Pattern membersPattern = Pattern.compile("\\((.*)\\)");
@@ -182,14 +215,31 @@ public class Generator {
         };
     }
 
-    public String capitalize(String input) {
+    private String capitalize(String input) {
         return String.format("%s%s", Character.toUpperCase(input.charAt(0)),
                 input.substring(1));
     }
 
-    public String substring(String input, int start, int end) {
+    private String substring(String input, int start, int end) {
         if (end < 0) {
             return input.substring(start);
         } else return input.substring(start, end);
+    }
+
+    private String[] splitQualifiedName(String type) {
+        int lastDotIndex = type.lastIndexOf(".");
+        boolean hasPackage = lastDotIndex > -1;
+        String packageName = hasPackage ? type.substring(0, lastDotIndex) : "";
+        String typeName = hasPackage ? type.substring(lastDotIndex + 1) : type;
+        return new String[]{packageName, typeName};
+    }
+
+    private TypeName typeName(String type) {
+        if (typeMap.containsKey(type)) {
+            return typeMap.get(type);
+        } else {
+            String[] splitType = splitQualifiedName(type);
+            return ClassName.get(splitType[0], splitType[1]);
+        }
     }
 }

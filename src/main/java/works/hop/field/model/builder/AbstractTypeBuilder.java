@@ -9,8 +9,7 @@ public abstract class AbstractTypeBuilder<T> implements TypeBuilder<T> {
     protected String name;
     protected String namespace;
     protected String items;
-    protected int size;
-    protected String defaultValue;
+    protected String values;
 
     @Override
     public String qualifiedName() {
@@ -50,7 +49,7 @@ public abstract class AbstractTypeBuilder<T> implements TypeBuilder<T> {
     }
 
     @Override
-    public AbstractTypeBuilder<T> add(String value) {
+    public AbstractTypeBuilder<T> add(String symbol) {
         //override in base class if need be
         return this;
     }
@@ -68,14 +67,8 @@ public abstract class AbstractTypeBuilder<T> implements TypeBuilder<T> {
     }
 
     @Override
-    public AbstractTypeBuilder<T> size(int size) {
-        this.size = size;
-        return this;
-    }
-
-    @Override
-    public AbstractTypeBuilder<T> defaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
+    public AbstractTypeBuilder<T> values(String values) {
+        this.values = values;
         return this;
     }
 }
