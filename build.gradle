@@ -32,16 +32,16 @@ test {
     useJUnitPlatform()
 }
 
-task generatedSources(dependsOn: 'classes', type: JavaExec) {
-    main = "works.hop.field.model"
-    classpath = sourceSets.main.runtimeClasspath
-    args "/src/main/resources/model"
-}
-
-sourceSets {
-    generated {
-        java.srcDirs "${generatedSources}"
-    }
-    // set up a dependency for the main sourceSet on the generated sourceSet
-    main.compileClasspath += generated.output
-}
+//task generatedSources(dependsOn: 'classes', type: JavaExec) {
+//    main = "works.hop.field.model"
+//    classpath = sourceSets.main.runtimeClasspath
+//    args "/src/main/resources/model"
+//}
+//
+//sourceSets {
+//    generated {
+//        java.srcDirs "${generatedSources}"
+//    }
+//    // set up a dependency for the main sourceSet on the generated sourceSet
+//    main.compileClasspath += generated.output
+//}

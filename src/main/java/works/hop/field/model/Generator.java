@@ -204,9 +204,9 @@ public class Generator {
                         for (String pair : pairs) {
                             if (pair.contains("=")) {
                                 String[] keyValue = pair.split("=");
-                                annotationBuilder.addMember(keyValue[0], "$S", keyValue[1]);
+                                annotationBuilder.addMember(keyValue[0].trim(), "$S", keyValue[1].trim());
                             } else {
-                                annotationBuilder.addMember("value", "$S", pair);
+                                annotationBuilder.addMember("value", "$S", pair.trim());
                             }
                         }
                     }
