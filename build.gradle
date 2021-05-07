@@ -32,6 +32,12 @@ test {
     useJUnitPlatform()
 }
 
+task generatedSources(dependsOn: 'classes', type: JavaExec) {
+    main = "works.hop.field.model"
+    classpath = sourceSets.main.runtimeClasspath
+    args "/src/main/resources/model"
+}
+
 sourceSets {
     generated {
         java.srcDirs "${generatedSources}"

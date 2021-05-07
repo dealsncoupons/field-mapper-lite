@@ -3,9 +3,7 @@ package works.hop.field.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 import static works.hop.field.model.TokenType.*;
@@ -54,16 +52,29 @@ public class Lexer {
 
     public Lexer(String file) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(file))))) {
-            StringBuilder lines = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.append(line).append("\n");
-            }
-            this.input = lines.toString();
+            this.input = readAllLines(reader);
         } catch (NullPointerException | IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public Lexer(File file) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            this.input = readAllLines(reader);
+        } catch (NullPointerException | IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String readAllLines(BufferedReader reader) throws IOException {
+        StringBuilder lines = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            lines.append(line).append("\n");
+        }
+        return lines.toString();
     }
 
     public static void main(String[] args) {

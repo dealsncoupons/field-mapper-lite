@@ -2,6 +2,8 @@ package works.hop.field.model;
 
 import works.hop.field.model.builder.*;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -25,17 +27,27 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-        Lexer gen = new Lexer("/model/ex2.avsc");
-        gen.parse();
+        String sourceDir = args != null && args.length > 0 ? args[0] : "/src/main/resources/model";
+        File folder = Paths.get(System.getProperty("user.dir"), sourceDir).toFile();
+        File[] listOfFiles = folder.listFiles((dir, name) -> name.endsWith(".avsc"));
 
-        Parser parser = new Parser(gen.getTokens());
-        parser.parse();
+        if (listOfFiles != null) {
+            for (File sourceFile : listOfFiles) {
+                Lexer gen = new Lexer(sourceFile);
+                gen.parse();
 
-        List<String> extraTypes = parser.getReadyList().stream().map(node ->
-                parser.qualifiedTypeName(node.packageName, node.name)).collect(Collectors.toList());
-        for (Node node : parser.getReadyList()) {
-            Generator generator = new Generator(node, extraTypes);
-            generator.generate();
+                Parser parser = new Parser(gen.getTokens());
+                parser.parse();
+
+                List<String> extraTypes = parser.getReadyList().stream().map(node ->
+                        parser.qualifiedTypeName(node.packageName, node.name)).collect(Collectors.toList());
+                for (Node node : parser.getReadyList()) {
+                    Generator generator = new Generator(node, extraTypes);
+                    generator.generate();
+                }
+            }
+        } else {
+            System.err.println("Could not locate or load source files from " + sourceDir);
         }
     }
 
