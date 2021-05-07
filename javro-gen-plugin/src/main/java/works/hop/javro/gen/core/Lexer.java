@@ -1,12 +1,10 @@
-package works.hop.field.model;
+package works.hop.javro.gen.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-
-import static works.hop.field.model.TokenType.*;
 
 public class Lexer {
 
@@ -20,33 +18,33 @@ public class Lexer {
     Action action = Action.READ_PROPERTY;
     Map<String, String> keywords = new HashMap<>() {
         {
-            put(NAMESPACE, "namespace");
-            put(DOC, "doc");
-            put(FIELDS, "fields");
-            put(ALIASES, "aliases");
-            put(DEFAULT, "default");
-            put(VALUES, "values");
-            put(SYMBOLS, "symbols");
-            put(ANNOTATIONS, "annotations");
-            put(LOGICAL_TYPE, "logicaltype");
-            put(PRECISION, "precision");
-            put(SCALE, "scale");
-            put(TYPE, "type");
-            put(NAME, "name");
-            put(NULL, "null");
-            put(BOOLEAN, "boolean");
-            put(INT, "int");
-            put(LONG, "long");
-            put(FLOAT, "float");
-            put(DOUBLE, "double");
-            put(BYTES, "bytes");
-            put(STRING, "string");
-            put(RECORD, "record");
-            put(ENUM, "enum");
-            put(ARRAY, "array");
-            put(MAP, "map");
-            put(FIXED, "fixed");
-            put(COMMENT, "comment");
+            put(TokenType.NAMESPACE, "namespace");
+            put(TokenType.DOC, "doc");
+            put(TokenType.FIELDS, "fields");
+            put(TokenType.ALIASES, "aliases");
+            put(TokenType.DEFAULT, "default");
+            put(TokenType.VALUES, "values");
+            put(TokenType.SYMBOLS, "symbols");
+            put(TokenType.ANNOTATIONS, "annotations");
+            put(TokenType.LOGICAL_TYPE, "logicaltype");
+            put(TokenType.PRECISION, "precision");
+            put(TokenType.SCALE, "scale");
+            put(TokenType.TYPE, "type");
+            put(TokenType.NAME, "name");
+            put(TokenType.NULL, "null");
+            put(TokenType.BOOLEAN, "boolean");
+            put(TokenType.INT, "int");
+            put(TokenType.LONG, "long");
+            put(TokenType.FLOAT, "float");
+            put(TokenType.DOUBLE, "double");
+            put(TokenType.BYTES, "bytes");
+            put(TokenType.STRING, "string");
+            put(TokenType.RECORD, "record");
+            put(TokenType.ENUM, "enum");
+            put(TokenType.ARRAY, "array");
+            put(TokenType.MAP, "map");
+            put(TokenType.FIXED, "fixed");
+            put(TokenType.COMMENT, "comment");
         }
     };
 
@@ -147,11 +145,11 @@ public class Lexer {
     }
 
     public void keyValueSeparator() {
-        tokens.add(new Token(current, ":", KEY_VALUE_SEP));
+        tokens.add(new Token(current, ":", TokenType.KEY_VALUE_SEP));
     }
 
     public void attributeSeparator() {
-        tokens.add(new Token(current, ",", ATTRIBUTE_SEP));
+        tokens.add(new Token(current, ",", TokenType.ATTRIBUTE_SEP));
     }
 
     public boolean matches(char ch) {
@@ -169,23 +167,23 @@ public class Lexer {
 
     public void startObject(char ch) {
         objectDepth.add(ch);
-        tokens.add(new Token(current, "{", START_OBJECT));
+        tokens.add(new Token(current, "{", TokenType.START_OBJECT));
     }
 
     public void endObject() {
         objectDepth.pop();
         action = Action.SEEK_NEXT;
-        tokens.add(new Token(current, "}", END_OBJECT));
+        tokens.add(new Token(current, "}", TokenType.END_OBJECT));
     }
 
     public void startArray(char ch) {
         arrayDepth.add(ch);
-        tokens.add(new Token(current, "[", START_ARRAY));
+        tokens.add(new Token(current, "[", TokenType.START_ARRAY));
     }
 
     public void endArray() {
         arrayDepth.pop();
-        tokens.add(new Token(current, "]", END_ARRAY));
+        tokens.add(new Token(current, "]", TokenType.END_ARRAY));
     }
 
     public void startString() {
@@ -196,7 +194,7 @@ public class Lexer {
         String value = input.substring(start, current);
         Token reserved = reserved(start, value);
         tokens.add(Objects.requireNonNullElseGet(reserved,
-                () -> new Token(start, input.substring(start, current), STRING)));
+                () -> new Token(start, input.substring(start, current), TokenType.STRING)));
         action = Action.SEEK_NEXT;
     }
 

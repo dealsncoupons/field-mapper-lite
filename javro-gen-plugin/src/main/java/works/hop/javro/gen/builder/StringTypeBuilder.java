@@ -1,4 +1,4 @@
-package works.hop.field.model.builder;
+package works.hop.javro.gen.builder;
 
 public class StringTypeBuilder extends AbstractTypeBuilder<String> {
 

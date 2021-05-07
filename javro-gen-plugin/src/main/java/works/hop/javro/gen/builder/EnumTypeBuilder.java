@@ -1,13 +1,13 @@
-package works.hop.field.model.builder;
+package works.hop.javro.gen.builder;
 
-import works.hop.field.model.Node;
+import works.hop.dto.gen.core.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EnumTypeBuilder extends AbstractTypeBuilder<Node> {
 
-    private List<String> enumSymbols = new ArrayList<>();
+    private final List<String> enumSymbols = new ArrayList<>();
 
     @Override
     public AbstractTypeBuilder<Node> add(String symbol) {

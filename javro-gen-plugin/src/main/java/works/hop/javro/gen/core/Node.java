@@ -1,11 +1,8 @@
-package works.hop.field.model;
-
-import lombok.Data;
+package works.hop.javro.gen.core;
 
 import java.util.LinkedList;
 import java.util.List;
 
-@Data
 public class Node {
 
     public String type;

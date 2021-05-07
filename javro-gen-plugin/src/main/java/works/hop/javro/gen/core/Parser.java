@@ -1,6 +1,6 @@
-package works.hop.field.model;
+package works.hop.javro.gen.core;
 
-import works.hop.field.model.builder.*;
+import works.hop.dto.gen.builder.*;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-import static works.hop.field.model.TokenType.*;
+import static works.hop.dto.gen.core.TokenType.*;
 
 public class Parser {
 
@@ -27,8 +27,15 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-        String sourceDir = args != null && args.length > 0 ? args[0] : "/src/main/resources/model";
-        File folder = Paths.get(System.getProperty("user.dir"), sourceDir).toFile();
+        String defaultSrcDir = "/src/main/resources/model";
+        String defaultDestDir = "build/generated/sources/";
+        String srcDir = args != null && args.length > 0 ? args[0] : defaultSrcDir;
+        String destDir = args != null && args.length > 0 ? args[0] : defaultDestDir;
+        Parser.generateSources(srcDir, destDir);
+    }
+
+    public static void generateSources(String srcDir, String destDir) {
+        File folder = Paths.get(System.getProperty("user.dir"), srcDir).toFile();
         File[] listOfFiles = folder.listFiles((dir, name) -> name.endsWith(".avsc"));
 
         if (listOfFiles != null) {
@@ -42,12 +49,12 @@ public class Parser {
                 List<String> extraTypes = parser.getReadyList().stream().map(node ->
                         parser.qualifiedTypeName(node.packageName, node.name)).collect(Collectors.toList());
                 for (Node node : parser.getReadyList()) {
-                    Generator generator = new Generator(node, extraTypes);
+                    Generator generator = new Generator(node, extraTypes, destDir);
                     generator.generate();
                 }
             }
         } else {
-            System.err.println("Could not locate or load source files from " + sourceDir);
+            System.err.println("Could not locate or load source files from " + srcDir);
         }
     }
 

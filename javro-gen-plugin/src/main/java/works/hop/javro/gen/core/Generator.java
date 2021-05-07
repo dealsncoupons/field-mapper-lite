@@ -1,4 +1,4 @@
-package works.hop.field.model;
+package works.hop.javro.gen.core;
 
 import com.squareup.javapoet.*;
 
@@ -13,13 +13,10 @@ import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static works.hop.field.model.TokenType.ARRAY;
-import static works.hop.field.model.TokenType.MAP;
-
 public class Generator {
 
     final Node node;
-    final String destDir = "build/generated/sources/";
+    final String destDir;
     final Map<String, TypeName> typeMap = new HashMap<>() {
         {
             put("null", null);
@@ -33,7 +30,7 @@ public class Generator {
         }
     };
 
-    public Generator(Node node, List<String> additionalTypes) {
+    public Generator(Node node, List<String> additionalTypes, String destDir) {
         this.node = node;
         Map<String, TypeName> extraTypes = new HashMap<>();
         for (String type : additionalTypes) {
@@ -41,6 +38,7 @@ public class Generator {
             extraTypes.put(type, ClassName.get(splitType[0], splitType[1]));
         }
         this.typeMap.putAll(extraTypes);
+        this.destDir = destDir;
     }
 
     public void generate() {
@@ -149,10 +147,10 @@ public class Generator {
 
     private TypeName createFieldType(Node fieldNode) {
         switch (fieldNode.type) {
-            case ARRAY:
+            case TokenType.ARRAY:
                 ClassName list = ClassName.get(List.class);
                 return ParameterizedTypeName.get(list, typeName(fieldNode.items));
-            case MAP:
+            case TokenType.MAP:
                 TypeName string = ClassName.get(String.class);
                 ClassName map = ClassName.get(Map.class);
                 return ParameterizedTypeName.get(map, string, typeName(fieldNode.values));
@@ -163,7 +161,7 @@ public class Generator {
 
     private FieldSpec createFieldSpec(Node fieldNode, List<AnnotationSpec> fieldAnnotations) {
         switch (fieldNode.type) {
-            case ARRAY:
+            case TokenType.ARRAY:
                 ClassName list = ClassName.get(List.class);
                 TypeName listType = ParameterizedTypeName.get(list, typeName(fieldNode.items));
                 return FieldSpec.builder(
@@ -172,7 +170,7 @@ public class Generator {
                         Modifier.PROTECTED)
                         .addAnnotations(fieldAnnotations)
                         .build();
-            case MAP:
+            case TokenType.MAP:
                 TypeName string = ClassName.get(String.class);
                 ClassName map = ClassName.get(Map.class);
                 TypeName mapType = ParameterizedTypeName.get(map, string, typeName(fieldNode.values));

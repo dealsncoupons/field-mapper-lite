@@ -1,7 +1,7 @@
-package works.hop.field.model.builder;
+package works.hop.javro.gen.builder;
 
-import works.hop.field.model.Node;
-import works.hop.field.model.TypeBuilder;
+import works.hop.javro.gen.core.Node;
+import works.hop.javro.gen.core.TypeBuilder;
 
 public abstract class AbstractTypeBuilder<T> implements TypeBuilder<T> {
 

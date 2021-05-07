@@ -1,4 +1,4 @@
-package works.hop.field.model;
+package works.hop.javro.gen.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

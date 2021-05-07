@@ -1,6 +1,7 @@
-package works.hop.field.model.builder;
+package works.hop.javro.gen.builder;
 
-import works.hop.field.model.Node;
+import works.hop.dto.javro.core.Node;
+import works.hop.javro.gen.core.Node;
 
 import java.util.ArrayList;
 import java.util.List;

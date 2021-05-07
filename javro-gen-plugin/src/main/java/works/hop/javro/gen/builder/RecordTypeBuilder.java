@@ -1,7 +1,6 @@
-package works.hop.field.model.builder;
+package works.hop.javro.gen.builder;
 
-import works.hop.field.model.Node;
-import works.hop.field.model.TypeBuilder;
+import works.hop.dto.gen.core.Node;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ public class RecordTypeBuilder extends AbstractTypeBuilder<Node> {
     }
 
     @Override
-    public TypeBuilder<Node> annotation(String annotation) {
+    public AbstractTypeBuilder<Node> annotation(String annotation) {
         this.annotations.add(annotation);
         return this;
     }

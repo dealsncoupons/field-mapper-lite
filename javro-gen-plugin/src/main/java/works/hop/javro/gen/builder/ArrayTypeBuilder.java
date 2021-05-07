@@ -1,8 +1,8 @@
-package works.hop.field.model.builder;
+package works.hop.javro.gen.builder;
 
-import works.hop.field.model.Node;
+import works.hop.javro.gen.core.Node;
 
-import static works.hop.field.model.TokenType.ARRAY;
+import static works.hop.javro.gen.core.TokenType.ARRAY;
 
 public class ArrayTypeBuilder extends AbstractTypeBuilder<Node> {
 

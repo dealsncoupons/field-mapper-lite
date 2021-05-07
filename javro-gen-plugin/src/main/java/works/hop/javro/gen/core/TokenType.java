@@ -1,4 +1,4 @@
-package works.hop.field.model;
+package works.hop.javro.gen.core;
 
 public class TokenType {
 
