@@ -1,23 +1,31 @@
 {
   "type": "record",
   "name": "Club",
-  "annotations":["works.hop.field.jdbc.annotation.Table(\"tbl_club\")"],
+  "annotations": [
+    "works.hop.field.jdbc.annotation.Table(\"tbl_club\")"
+  ],
   "namespace": "works.hop.field.jdbc.entity.avro",
   "fields": [
     {
-      "name":"id",
+      "name": "id",
       "type": "java.util.UUID",
-      "annotations": ["works.hop.field.jdbc.annotation.Id()"]
+      "annotations": [
+        "works.hop.field.jdbc.annotation.Id()"
+      ]
     },
     {
       "name": "dateCreated",
       "type": "java.time.LocalDate",
-      "annotations": ["works.hop.field.jdbc.annotation.Column(\"date_created\")"]
+      "annotations": [
+        "works.hop.field.jdbc.annotation.Column(\"date_created\")"
+      ]
     },
     {
       "name": "lastUpdated",
       "type": "java.time.LocalDateTime",
-      "annotations": ["works.hop.field.jdbc.annotation.Column(\"last_updated\")"]
+      "annotations": [
+        "works.hop.field.jdbc.annotation.Column(\"last_updated\")"
+      ]
     },
     {
       "name": "title",

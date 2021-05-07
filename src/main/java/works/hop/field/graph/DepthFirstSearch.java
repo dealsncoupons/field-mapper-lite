@@ -10,7 +10,7 @@ public class DepthFirstSearch {
 
         while (!stack.isEmpty()) {
             Vertex<String> vertex = stack.pop();
-            if(!vertex.isVisited()) {
+            if (!vertex.isVisited()) {
                 vertex.setVisited(true);
                 System.out.println("Visiting node " + vertex);
                 stack.addAll(vertex.getNeighbours());

@@ -29,7 +29,7 @@ public class Lexer {
             put(DEFAULT, "default");
             put(VALUES, "values");
             put(SYMBOLS, "symbols");
-            put(ANNOTATIONS,  "annotations");
+            put(ANNOTATIONS, "annotations");
             put(LOGICAL_TYPE, "logicaltype");
             put(PRECISION, "precision");
             put(SCALE, "scale");
@@ -95,7 +95,7 @@ public class Lexer {
                     endArray();
                     break;
                 case '\"':
-                    if(current > 1 && input.charAt(current - 1) != '\\') startString();
+                    if (current > 1 && input.charAt(current - 1) != '\\') startString();
                     break;
                 case ':':
                     keyValueSeparator();

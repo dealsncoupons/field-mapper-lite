@@ -14,7 +14,7 @@ public abstract class AbstractTypeBuilder<T> implements TypeBuilder<T> {
 
     @Override
     public String qualifiedName() {
-        return namespace != null?
+        return namespace != null ?
                 namespace + "." + name :
                 name;
     }

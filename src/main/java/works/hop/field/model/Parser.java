@@ -12,10 +12,8 @@ public class Parser {
 
     final List<Token> tokens = new ArrayList<>();
     final Stack<TypeBuilder<?>> builderStack = new Stack<>();
-    final List<String> primitiveTypes = List.of("null", "boolean", "int", "long", "float", "double", "bytes", "string");
-    final List<String> complexTypes = List.of("record", "array", "enum", "map", "fixed");
-    final List<Node> nodesBuilt = new ArrayList<>();
-    final List<String> generatedTypes = new ArrayList<>();
+    final List<Node> readyList = new ArrayList<>();
+    String namespace;
     int current = 0;
 
     public Parser(List<Token> tokens) {
@@ -26,18 +24,20 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-        Lexer gen = new Lexer("/model/account.avsc");
+        Lexer gen = new Lexer("/model/ex2.avsc");
         gen.parse();
 
         Parser parser = new Parser(gen.getTokens());
         parser.parse();
 
-        Generator generator = new Generator(parser.getNodesBuilt().get(0));
-        generator.generate();
+        for (Node node : parser.getReadyList()) {
+            Generator generator = new Generator(node);
+            generator.generate();
+        }
     }
 
-    public List<Node> getNodesBuilt() {
-        return nodesBuilt;
+    public List<Node> getReadyList() {
+        return readyList;
     }
 
     public void parse() {
@@ -54,69 +54,21 @@ public class Parser {
         switch (token.value) {
             case RECORD:
                 recordDefinition();
+                this.readyList.add((Node) builderStack.pop().build());
                 break;
             case ENUM:
                 enumDefinition();
+                this.readyList.add((Node) builderStack.pop().build());
                 break;
             default:
                 throw new RuntimeException("Cannot parse unknown type");
         }
-    }
-
-    public void nullType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("null")) {
-            throw new RuntimeException("Expected null type by found " + token.type);
-        }
-    }
-
-    public void booleanType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("boolean")) {
-            throw new RuntimeException("Expected boolean type by found " + token.type);
-        }
-    }
-
-    public void intType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("int")) {
-            throw new RuntimeException("Expected int type by found " + token.type);
-        }
-    }
-
-    public void longType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("long")) {
-            throw new RuntimeException("Expected long type by found " + token.type);
-        }
-    }
-
-    public void floatType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("float")) {
-            throw new RuntimeException("Expected float type by found " + token.type);
-        }
-    }
-
-    public void doubleType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("double")) {
-            throw new RuntimeException("Expected double type by found " + token.type);
-        }
-    }
-
-    public void bytesType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("bytes")) {
-            throw new RuntimeException("Expected bytes type by found " + token.type);
-        }
-    }
-
-    public void stringType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("string")) {
-            throw new RuntimeException("Expected string type by found " + token.type);
-        }
+        //apply missing namespace if one is defined
+        this.readyList.forEach(node -> {
+            if (node.packageName == null) {
+                node.packageName = namespace;
+            }
+        });
     }
 
     public void recordType() {
@@ -144,27 +96,6 @@ public class Parser {
         Token token = tokens.get(current);
         if (!token.value.equals("map")) {
             throw new RuntimeException("Expected map type by found " + token.type);
-        }
-    }
-
-    public void fixedType() {
-        Token token = tokens.get(current);
-        if (!token.type.equals("fixed")) {
-            throw new RuntimeException("Expected fixed type by found " + token.type);
-        }
-    }
-
-    public void primitiveType() {
-        Token token = tokens.get(current);
-        if (!primitiveTypes.contains(token.type)) {
-            throw new RuntimeException("Expected a primitive type by found " + token.type);
-        }
-    }
-
-    public void complexType() {
-        Token token = tokens.get(current);
-        if (!complexTypes.contains(token.type)) {
-            throw new RuntimeException("Expected a complex type by found " + token.type);
         }
     }
 
@@ -210,13 +141,6 @@ public class Parser {
         }
     }
 
-    public void sizeAttribute() {
-        Token token = tokens.get(current);
-        if (!token.value.equals("size")) {
-            throw new RuntimeException("Expected a size attribute by found " + token.type);
-        }
-    }
-
     public void valuesAttribute() {
         Token token = tokens.get(current);
         if (!token.value.equals("values")) {
@@ -235,13 +159,6 @@ public class Parser {
         Token token = tokens.get(current);
         if (!token.value.equals("fields")) {
             throw new RuntimeException("Expected a fields attribute by found " + token.type);
-        }
-    }
-
-    public void defaultAttribute() {
-        Token token = tokens.get(current);
-        if (!token.value.equals("default")) {
-            throw new RuntimeException("Expected a default attribute by found " + token.type);
         }
     }
 
@@ -334,6 +251,40 @@ public class Parser {
         endArray();
     }
 
+    public void arrayDefinition() {
+        startObject();
+        current++;
+        typeAttribute();
+        current++;
+        arrayType();
+        ArrayTypeBuilder arrayBuilder = new ArrayTypeBuilder();
+        builderStack.add(arrayBuilder);
+        arrayBuilder.type(tokens.get(current).type);
+        current++;
+        attributeSep();
+        itemsProperty();
+        ArrayTypeBuilder builder = (ArrayTypeBuilder) builderStack.pop();
+        //??? NOT YET HANDLED
+        endObject();
+    }
+
+    public void mapDefinition() {
+        startObject();
+        current++;
+        typeAttribute();
+        current++;
+        mapType();
+        MapTypeBuilder mapTypeBuilder = new MapTypeBuilder();
+        builderStack.add(mapTypeBuilder);
+        mapTypeBuilder.type(tokens.get(current).type);
+        current++;
+        attributeSep();
+        valuesProperty();
+        MapTypeBuilder builder = (MapTypeBuilder) builderStack.pop();
+        //??? NOT YET HANDLED
+        endObject();
+    }
+
     public void enumDefinition() {
         startObject();
         current++;
@@ -377,22 +328,6 @@ public class Parser {
             token = tokens.get(current);
         }
         endObject();
-        this.nodesBuilt.add((Node) builderStack.pop().build());
-    }
-
-    public void arrayDefinition() {
-        startObject();
-        current++;
-        typeAttribute();
-        current++;
-        arrayType();
-        ArrayTypeBuilder arrayBuilder = new ArrayTypeBuilder();
-        builderStack.add(arrayBuilder);
-        arrayBuilder.type(tokens.get(current).type);
-        current++;
-        attributeSep();
-        itemsProperty();
-        endObject();
     }
 
     public void typeProperty() {
@@ -405,14 +340,36 @@ public class Parser {
             unionDefinition();
             UnionTypeBuilder unionTypes = (UnionTypeBuilder) builderStack.pop();
             builderStack.peek().type(unionTypes.build().type);
-        }
-        else if(next.type.equals(START_OBJECT)){
-            recordDefinition();
-            RecordTypeBuilder recordBuilder = (RecordTypeBuilder) builderStack.pop();
-            Node nestedRecord = recordBuilder.build();
-            String recordType = nestedRecord.packageName + nestedRecord.type;
-            builderStack.peek().type(recordType);
-            this.nodesBuilt.add(nestedRecord);
+        } else if (next.type.equals(START_OBJECT)) {
+            //figure out whether to handle 'record', 'array' or 'map' type
+            List<String> permissible = List.of(RECORD, ARRAY, MAP);
+            int index = current;
+            while (index < tokens.size() && !permissible.contains(tokens.get(index).value)) {
+                index++;
+            }
+            //type token found, so get the value
+            String typeToHandle = tokens.get(index).value;
+
+            switch (typeToHandle) {
+                case RECORD:
+                    recordDefinition();
+                    RecordTypeBuilder recordBuilder = (RecordTypeBuilder) builderStack.pop();
+                    Node record = recordBuilder.build();
+                    String recordType = String.format("%s.%s", record.packageName != null ? record.packageName : namespace, record.name);
+                    builderStack.peek().type(recordType);
+                    this.readyList.add(record);
+                    break;
+                case MAP:
+                    mapDefinition();
+                    //??? NOT YET HANDLED - to be completed. Define map signature
+                    break;
+                case ARRAY:
+                    arrayDefinition();
+                    //??? NOT YET HANDLED - to be completed. Define collection signature
+                    break;
+                default:
+                    throw new RuntimeException("Encountered type '" + typeToHandle + "' which is not handled (yet)");
+            }
         } else {
             string();
             builderStack.peek().type(tokens.get(current).value);
@@ -446,6 +403,25 @@ public class Parser {
         current++;
         string();
         builderStack.peek().items(tokens.get(current).value);
+        current++;
+        if (tokens.get(current).type.equals(ATTRIBUTE_SEP)) {
+            attributeSep();
+            current++;
+        }
+    }
+
+    public void valuesProperty() {
+        valuesAttribute();
+        current++;
+        keyValueSep();
+        current++;
+        string();
+        builderStack.peek().items(tokens.get(current).value);
+        current++;
+        if (tokens.get(current).type.equals(ATTRIBUTE_SEP)) {
+            attributeSep();
+            current++;
+        }
     }
 
     public void nameProperty() {
@@ -567,6 +543,7 @@ public class Parser {
                 case NAMESPACE:
                     namespaceProperty();
                     recordBuilder.namespace(tokens.get(current).value);
+                    this.namespace = tokens.get(current).value;
                     current++;
                     break;
                 case ALIASES:
@@ -578,7 +555,6 @@ public class Parser {
                     current++;
                     break;
                 case FIELDS:
-                    generatedTypes.add(recordBuilder.qualifiedName()); //allows using this type as a field type
                     fieldsProperty();
                     current++;
                     break;
@@ -600,6 +576,5 @@ public class Parser {
             token = tokens.get(current);
         }
         endObject();
-        this.nodesBuilt.add((Node) builderStack.pop().build());
     }
 }

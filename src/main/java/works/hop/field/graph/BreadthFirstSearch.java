@@ -11,12 +11,12 @@ public class BreadthFirstSearch {
         //mark as visited
         root.setVisited(true);
 
-        while(!queue.isEmpty()){
+        while (!queue.isEmpty()) {
             Vertex<String> vertex = queue.poll();
             System.out.println("Visiting node " + vertex);
 
-            for(Vertex<String> neighbour : vertex.getNeighbours()){
-                if(!neighbour.isVisited()){
+            for (Vertex<String> neighbour : vertex.getNeighbours()) {
+                if (!neighbour.isVisited()) {
                     queue.add(neighbour);
                     neighbour.setVisited(true);
                 }

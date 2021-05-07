@@ -19,33 +19,8 @@ public class MazeMap {
         IntStream.range(0, size).forEach(cell -> vertices.put(cell, new Vertex<>(cell)));
     }
 
-    public void addConnection(int cellA, int cellB){
-        vertices.get(cellA).addNeighbour(vertices.get(cellB));
-    }
-
-    public void traverse(int startCell, int endCell){
-        Stack<Vertex<Integer>> stack = new Stack<>();
-        stack.add(vertices.get(startCell));
-
-        end:
-        while(!stack.isEmpty()){
-            Vertex<Integer> vertex = stack.pop();
-            vertex.setVisited(true);
-            for(Vertex<Integer> neighbour : vertex.getNeighbours()){
-                if(!neighbour.isVisited()){
-                    System.out.println("Visiting " + neighbour.getName());
-                    stack.add(neighbour);
-                    if(neighbour.getName() == endCell){
-                        System.out.println("Found exit point");
-                        break end;
-                    }
-                }
-            }
-        }
-    }
-
     public static void main(String[] args) {
-        MazeMap maze =new MazeMap(5, 5);
+        MazeMap maze = new MazeMap(5, 5);
         //add connections
         maze.addConnection(6, 7);
         maze.addConnection(7, 6);
@@ -62,5 +37,30 @@ public class MazeMap {
         int startCell = 6;
         int endCell = 24;
         maze.traverse(startCell, endCell);
+    }
+
+    public void addConnection(int cellA, int cellB) {
+        vertices.get(cellA).addNeighbour(vertices.get(cellB));
+    }
+
+    public void traverse(int startCell, int endCell) {
+        Stack<Vertex<Integer>> stack = new Stack<>();
+        stack.add(vertices.get(startCell));
+
+        end:
+        while (!stack.isEmpty()) {
+            Vertex<Integer> vertex = stack.pop();
+            vertex.setVisited(true);
+            for (Vertex<Integer> neighbour : vertex.getNeighbours()) {
+                if (!neighbour.isVisited()) {
+                    System.out.println("Visiting " + neighbour.getName());
+                    stack.add(neighbour);
+                    if (neighbour.getName() == endCell) {
+                        System.out.println("Found exit point");
+                        break end;
+                    }
+                }
+            }
+        }
     }
 }

@@ -38,11 +38,9 @@ public class Generator {
         if (typeMap.containsKey(type)) {
             return typeMap.get(type);
         } else {
-            try {
-                return TypeName.get(Class.forName(type));
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException("You need to define generate the type '" + type + "' first before using it", e);
-            }
+            String packageName = type.substring(type.lastIndexOf("."));
+            String simpleName = type.substring(type.lastIndexOf(".") + 1);
+            return ClassName.get(packageName, simpleName);
         }
     }
 
@@ -84,7 +82,7 @@ public class Generator {
             //field annotations
             List<AnnotationSpec> fieldAnnotations = new ArrayList<>();
             for (String annotationValue : child.annotations) {
-                String annotationName = annotationValue.substring(0, annotationValue.indexOf("("));
+                String annotationName = substring(annotationValue, 0, annotationValue.indexOf("("));
                 try {
                     AnnotationSpec.Builder annotationBuilder = AnnotationSpec.builder(Class.forName(annotationName));
                     addMembers().accept(annotationValue, annotationBuilder);
@@ -187,5 +185,11 @@ public class Generator {
     public String capitalize(String input) {
         return String.format("%s%s", Character.toUpperCase(input.charAt(0)),
                 input.substring(1));
+    }
+
+    public String substring(String input, int start, int end) {
+        if (end < 0) {
+            return input.substring(start);
+        } else return input.substring(start, end);
     }
 }

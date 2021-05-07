@@ -4,7 +4,6 @@ import works.hop.field.model.Node;
 import works.hop.field.model.TypeBuilder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class RecordTypeBuilder extends AbstractTypeBuilder<Node> {

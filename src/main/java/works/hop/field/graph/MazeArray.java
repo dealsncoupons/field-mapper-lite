@@ -39,7 +39,7 @@ public class MazeArray {
             System.out.println("No path exists");
     }
 
-    private int cell(int r, int c){
+    private int cell(int r, int c) {
         return (r * maze.length) + c;
     }
 

@@ -17,7 +17,23 @@
         "null",
         "LongList"
       ]
-    }
+    },
     // optional next element
+    {
+      "name": "mylist",
+      "type": {
+        "type": "array",
+        "items": "string"
+      }
+    },
+    //list of strings
+    {
+      "name": "mymap",
+      "type": {
+        "type": "map",
+        "values": "long"
+      }
+    }
+    //map of <string, long>
   ]
 }
