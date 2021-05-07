@@ -23,6 +23,8 @@ public interface TypeBuilder<T> {
 
     TypeBuilder<T> add(String value);
 
+    TypeBuilder<T> annotation(String annotations);
+
     TypeBuilder<T> items(String items);
 
     TypeBuilder<T> size(int size);

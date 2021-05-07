@@ -18,6 +18,6 @@ public class UnionTypeBuilder extends AbstractTypeBuilder<Node> {
     @Override
     public Node build() {
         String firstNonNullType = unionTypes.stream().filter(item -> !"null".equals(item)).findFirst().get();
-        return new Node(firstNonNullType, name, namespace);
+        return new Node(firstNonNullType, name);
     }
 }

@@ -1,0 +1,42 @@
+{
+  "type": "record",
+  "name": "Membership",
+  "annotations":["works.hop.field.jdbc.annotation.Table(\"tbl_membership\")"],
+  "namespace": "works.hop.field.jdbc.entity.avro",
+  "fields": [
+    {
+      "name": "dateCreated",
+      "type": "java.time.LocalDate",
+      "annotations": ["works.hop.field.jdbc.annotation.Column(\"date_created\")"]
+    },
+    {
+      "name": "lastUpdated",
+      "type": "java.time.LocalDateTime",
+      "annotations": ["works.hop.field.jdbc.annotation.Column(\"last_updated\")"]
+    },
+    {
+      "name": "member",
+      "type": "java.util.UUID",
+      "annotations": [
+        "works.hop.field.jdbc.annotation.Id()",
+        "works.hop.field.jdbc.annotation.Column(\"member_id\")"]
+    },
+    {
+      "name": "club",
+      "type": "java.util.UUID",
+      "annotations": [
+        "works.hop.field.jdbc.annotation.Id()",
+        "works.hop.field.jdbc.annotation.Column(\"club_id\")"]
+    },
+    {
+      "name": "alias",
+      "type": "string",
+      "annotations": ["works.hop.field.jdbc.annotation.Column(\"member_alias\")"]
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "annotations": ["works.hop.field.jdbc.annotation.Column(\"member_status\")"]
+    }
+  ]
+}

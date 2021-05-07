@@ -29,7 +29,8 @@ public class Lexer {
             put(DEFAULT, "default");
             put(VALUES, "values");
             put(SYMBOLS, "symbols");
-            put(LOGICAL_TYPE, "logicalType");
+            put(ANNOTATIONS,  "annotations");
+            put(LOGICAL_TYPE, "logicaltype");
             put(PRECISION, "precision");
             put(SCALE, "scale");
             put(TYPE, "type");
@@ -94,7 +95,7 @@ public class Lexer {
                     endArray();
                     break;
                 case '\"':
-                    startString();
+                    if(current > 1 && input.charAt(current - 1) != '\\') startString();
                     break;
                 case ':':
                     keyValueSeparator();
@@ -178,7 +179,7 @@ public class Lexer {
 
     public void startString() {
         int start = ++current;
-        while (!isEOF() && !matches('\"')) {
+        while (!isEOF() && (!matches('\"') || input.charAt(current - 1) == '\\')) {
             current++;
         }
         String value = input.substring(start, current);

@@ -56,6 +56,12 @@ public abstract class AbstractTypeBuilder<T> implements TypeBuilder<T> {
     }
 
     @Override
+    public TypeBuilder<T> annotation(String annotations) {
+        //override in base class if need be
+        return this;
+    }
+
+    @Override
     public AbstractTypeBuilder<T> items(String items) {
         this.items = items;
         return this;

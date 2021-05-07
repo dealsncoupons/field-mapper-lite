@@ -1,69 +1,12 @@
 package works.hop.field.model;
 
 import works.hop.field.model.builder.*;
-import works.hop.field.model.generator.Generator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import static works.hop.field.model.TokenType.*;
-
-//  primitiveType() -> nullType() | booleanType() | intType() | longType() | floatType() | doubleType() | bytesType() | stringType()
-//  complexType()   -> recordType() | enumType() | arrayType () | mapType() | fixedType()
-//  nullType()      -> "null"
-//  booleanType()   -> "boolean"
-//  intType()       -> "int"
-//  longType()      -> "long"
-//  floatType()     -> "float"
-//  doubleType()    -> "double"
-//  bytesType()     -> "bytes"
-//  stringType()    -> "string"
-//  recordType()    -> "record"
-//  enumType()    -> "enum"
-//  arrayType()    -> "array"
-//  mapType()    -> "map"
-//  fixedType()    -> "fixed"
-//  typeAttribute()  -> "type"
-//  symbolsAttribute()  -> "symbols"
-//  itemsAttribute()    -> "items"
-//  nameAttribute()    -> "name"
-//  sizeAttribute()    -> "size"
-//  valuesAttribute()    -> "values"
-//  aliasesAttribute()  -> "aliases"
-//  fieldsAttribute()   -> "fields"
-//  defaultAttribute()   -> "default"
-//  docAttribute()   -> "doc"
-//  namespaceAttribute()   -> "namespace"
-//  keyValueSep()   -> ":"
-//  attributeSep()  -> ","
-//  startObject()  -> "{"
-//  endObject()  -> "}"
-//  startArray()  -> "["
-//  endArray()  -> "]"
-//  fieldName()     -> string()
-//  symbolsProperty()   -> symbolsAttribute() keyValueSep() startArray() string()+ endArray()
-//  docProperty()   -> docAttribute()  keyValueSep() string()
-//  fieldDefinition() -> startObject() nameProperty(), attributeSep(), typeProperty() endObject()
-//  fieldsProperty() -> fieldsAttribute() keyValueSep() startArray() fieldDefinition()+, endArray()
-//  typeProperty()  -> typeAttribute() keyValueSep() (primitiveType() | complexType() | unionDefinition())
-//  nameProperty()  -> nameAttribute() keyValueSep() fieldName()
-//  sizeProperty()  -> sizeAttribute() keyValueSep() int()
-//  itemsProperty() -> itemsAttribute() keyValueSep() ()string()
-//  defaultListProperty()   -> defaultAttribute() keyValueSep() startArray() string()* endArray()
-//  defaultMapProperty()   -> defaultAttribute() keyValueSep() startObject()  endObject()
-//  aliasesProperty()   -> aliasesAttribute() keyValueSep() startArray() string()+ endArray()
-//  recordDefinition()    -> startObject() typeProperty() attributeSep() nameProperty()
-//                  -> [attributeSep() docProperty()] [attributeSep() aliasesProperty()]
-//                  -> attributeSep() fieldsProperty()
-//                  -> endObject()
-//  enumDefinition()    -> startObject() typeAttribute() attributeSep() nameProperty() symbolsProperty()
-//                      endObject()
-//  arrayDefinition()     -> startObject() typeAttribute() attributeSep() arrayType()
-//                      attributeSep() itemsProperty() [attributeSep() defaultListProperty()] endObject()
-//  mapDefinition()     -> startObject() typeProperty() attributeSep() valuesProperty() [attributeSep() defaultMapProperty()] endObject()
-//  unionDefinition()     -> startArray() string()+ endArray()
-//  fixedDefinition()   -> startObject() typeProperty() attributeSep() sizeProperty() attributeSep() nameProperty() endObject()
 
 public class Parser {
 
@@ -83,7 +26,7 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-        Lexer gen = new Lexer("/model/ex3.avsc");
+        Lexer gen = new Lexer("/model/account.avsc");
         gen.parse();
 
         Parser parser = new Parser(gen.getTokens());
@@ -260,6 +203,13 @@ public class Parser {
         }
     }
 
+    public void annotationsAttribute() {
+        Token token = tokens.get(current);
+        if (!token.value.equals("annotations")) {
+            throw new RuntimeException("Expected an annotations attribute by found " + token.type);
+        }
+    }
+
     public void sizeAttribute() {
         Token token = tokens.get(current);
         if (!token.value.equals("size")) {
@@ -349,7 +299,6 @@ public class Parser {
     }
 
     public void symbolsProperty() {
-        //symbolsAttribute() keyValueSep() startArray() string()+ endArray()
         symbolsAttribute();
         current++;
         keyValueSep();
@@ -369,7 +318,6 @@ public class Parser {
     }
 
     public void unionDefinition() {
-        //startArray() string()+ endArray()
         startArray();
         UnionTypeBuilder unionTypeBuilder = new UnionTypeBuilder();
         builderStack.add(unionTypeBuilder);
@@ -387,13 +335,11 @@ public class Parser {
     }
 
     public void enumDefinition() {
-        //startObject() typeAttribute() attributeSep() nameProperty() symbolsProperty() endObject()
         startObject();
         current++;
 
         EnumTypeBuilder enumBuilder = new EnumTypeBuilder();
         builderStack.add(enumBuilder);
-        enumBuilder.type(tokens.get(current).type);
 
         List<String> acceptable = List.of(TYPE, NAME, SYMBOLS);
         Token token = tokens.get(current);
@@ -405,6 +351,7 @@ public class Parser {
                     keyValueSep();
                     current++;
                     enumType();
+                    enumBuilder.type(tokens.get(current).value);
                     current++;
                     break;
                 case NAME:
@@ -430,11 +377,10 @@ public class Parser {
             token = tokens.get(current);
         }
         endObject();
+        this.nodesBuilt.add((Node) builderStack.pop().build());
     }
 
     public void arrayDefinition() {
-        //startObject() typeAttribute() attributeSep() arrayType()
-        //attributeSep() itemsProperty() [attributeSep() defaultListProperty()] endObject()
         startObject();
         current++;
         typeAttribute();
@@ -450,7 +396,6 @@ public class Parser {
     }
 
     public void typeProperty() {
-        //typeAttribute() keyValueSep() ()string()
         typeAttribute();
         current++;
         keyValueSep();
@@ -460,14 +405,41 @@ public class Parser {
             unionDefinition();
             UnionTypeBuilder unionTypes = (UnionTypeBuilder) builderStack.pop();
             builderStack.peek().type(unionTypes.build().type);
+        }
+        else if(next.type.equals(START_OBJECT)){
+            recordDefinition();
+            RecordTypeBuilder recordBuilder = (RecordTypeBuilder) builderStack.pop();
+            Node nestedRecord = recordBuilder.build();
+            String recordType = nestedRecord.packageName + nestedRecord.type;
+            builderStack.peek().type(recordType);
+            this.nodesBuilt.add(nestedRecord);
         } else {
             string();
             builderStack.peek().type(tokens.get(current).value);
         }
     }
 
+    public void annotationsProperty() {
+        annotationsAttribute();
+        current++;
+        keyValueSep();
+        current++;
+        startArray();
+        current++;
+        string();
+        builderStack.peek().annotation(tokens.get(current).value);
+        current++;
+        while (tokens.get(current).type.equals(ATTRIBUTE_SEP)) {
+            attributeSep();
+            current++;
+            string();
+            builderStack.peek().annotation(tokens.get(current).value);
+            current++;
+        }
+        endArray();
+    }
+
     public void itemsProperty() {
-        //itemsAttribute() keyValueSep() ()string()
         itemsAttribute();
         current++;
         keyValueSep();
@@ -477,7 +449,6 @@ public class Parser {
     }
 
     public void nameProperty() {
-        //nameAttribute() keyValueSep() ()string()
         nameAttribute();
         current++;
         keyValueSep();
@@ -486,7 +457,6 @@ public class Parser {
     }
 
     public void namespaceProperty() {
-        //namespaceAttribute() keyValueSep() ()string()
         namespaceAttribute();
         current++;
         keyValueSep();
@@ -495,7 +465,6 @@ public class Parser {
     }
 
     public void aliasesProperty() {
-        //aliasesAttribute() keyValueSep() startArray() string()+ endArray()
         aliasesAttribute();
         current++;
         keyValueSep();
@@ -508,7 +477,6 @@ public class Parser {
     }
 
     public void docProperty() {
-        //docAttribute()  keyValueSep() string()
         docAttribute();
         current++;
         keyValueSep();
@@ -516,32 +484,15 @@ public class Parser {
         string();
     }
 
-    public void fieldDefinition() {
-        //startObject() nameProperty(), attributeSep(), typeProperty() endObject()
-        startObject();
-        current++;
-        nameProperty();
-        FieldTypeBuilder fieldBuilder = new FieldTypeBuilder();
-        builderStack.add(fieldBuilder);
-        fieldBuilder.name(tokens.get(current).value);
-        current++;
-        attributeSep();
-        current++;
-        typeProperty();
-        current++;
-        endObject();
-    }
-
     public void fieldsProperty() {
-        //fieldsAttribute() keyValueSep() startArray() fieldDefinition()+, endArray()
         fieldsAttribute();
         current++;
         keyValueSep();
         current++;
         startArray();
         current++;
-        boolean parseFields = tokens.get(current).type.equals(START_OBJECT);
-        while (parseFields) {
+        boolean hasNext = tokens.get(current).type.equals(START_OBJECT);
+        while (hasNext) {
             fieldDefinition();
             FieldTypeBuilder fieldTypeBuilder = (FieldTypeBuilder) builderStack.pop();
             builderStack.peek().add(fieldTypeBuilder.build());
@@ -551,21 +502,56 @@ public class Parser {
                 attributeSep();
                 current++;
             } else {
-                parseFields = false;
+                hasNext = false;
             }
         }
         endArray();
     }
 
-    public void recordDefinition() {
-        //startObject() typeProperty() attributeSep() nameProperty()
-        //  -> [attributeSep() docProperty()] [attributeSep() aliasesProperty()]
-        //  -> attributeSep() fieldsProperty() endObject()
+    public void fieldDefinition() {
         startObject();
+        current++;
+
+        FieldTypeBuilder fieldTypeBuilder = new FieldTypeBuilder();
+        builderStack.add(fieldTypeBuilder);
+
+        List<String> acceptable = List.of(TYPE, NAME, ANNOTATIONS, DOC);
+        Token token = tokens.get(current);
+        while (acceptable.contains(token.type)) {
+            switch (token.type) {
+                case TYPE:
+                    typeProperty();
+                    current++;
+                    break;
+                case NAME:
+                    nameProperty();
+                    fieldTypeBuilder.name(tokens.get(current).value);
+                    current++;
+                    break;
+                case ANNOTATIONS:
+                    annotationsProperty();
+                    current++;
+                    break;
+                default:
+                    break;
+            }
+            if (tokens.get(current).type.equals(ATTRIBUTE_SEP)) {
+                attributeSep();
+                current++;
+            }
+            token = tokens.get(current);
+        }
+        endObject();
+    }
+
+    public void recordDefinition() {
+        startObject();
+        current++;
+
         RecordTypeBuilder recordBuilder = new RecordTypeBuilder();
         builderStack.add(recordBuilder);
-        current++;
-        List<String> acceptable = List.of(TYPE, NAMESPACE, NAME, ALIASES, FIELDS, DOC);
+
+        List<String> acceptable = List.of(TYPE, NAMESPACE, NAME, ALIASES, FIELDS, ANNOTATIONS, DOC);
         Token token = tokens.get(current);
         while (acceptable.contains(token.type)) {
             switch (token.type) {
@@ -585,6 +571,10 @@ public class Parser {
                     break;
                 case ALIASES:
                     aliasesProperty();
+                    current++;
+                    break;
+                case ANNOTATIONS:
+                    annotationsProperty();
                     current++;
                     break;
                 case FIELDS:

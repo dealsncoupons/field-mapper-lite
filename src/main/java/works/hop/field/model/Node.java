@@ -1,19 +1,23 @@
 package works.hop.field.model;
 
+import lombok.Data;
+
 import java.util.LinkedList;
 import java.util.List;
 
+@Data
 public class Node {
 
     public String type;
     public String name;
     public String packageName;
     public List<Node> children = new LinkedList<>();
+    public List<String> symbols = new LinkedList<>();
+    public List<String> annotations = new LinkedList<>();
 
-    public Node(String type, String name, String packageName) {
+    public Node(String type, String name) {
         this.type = type;
         this.name = name;
-        this.packageName = packageName;
     }
 
     public void child(Node child) {

@@ -1,0 +1,77 @@
+{
+  "type": "record",
+  "namespace": "works.hop.field.jdbc.entity.avro",
+  "name": "Account",
+  "annotations":["works.hop.field.jdbc.annotation.Table(\"tbl_account\")"],
+  "fields": [
+    {
+      "name":"id",
+      "type": "java.util.UUID",
+      "annotations": ["works.hop.field.jdbc.annotation.Id()"]
+    },
+    {
+      "name": "dateCreated",
+      "type": "java.time.LocalDate",
+      "annotations": ["works.hop.field.jdbc.annotation.Column(\"date_created\")"]
+    },
+    {
+      "name": "lastUpdated",
+      "type": "java.time.LocalDateTime",
+      "annotations": ["works.hop.field.jdbc.annotation.Column(\"last_updated\")"]
+    },
+    {
+      "name": "username",
+      "type": "string"
+    },
+    {
+      "name": "accessCode",
+      "type": "string",
+      "annotations": ["works.hop.field.jdbc.annotation.Column(\"access_code\")"]
+    },
+    {
+      "name": "member",
+      "annotations": ["works.hop.field.jdbc.annotation.Column(\"member_id\")"],
+      "type": {
+        "type": "record",
+        "annotations":["works.hop.field.jdbc.annotation.Table(\"tbl_member\")"],
+        "name": "Member",
+        "fields": [
+          {
+            "name": "fullName",
+            "type": "java.time.LocalDateTime",
+            "annotations": ["works.hop.field.jdbc.annotation.Column(\"full_name\")"]
+          },
+          {
+            "name": "emailAddr",
+            "type": "string",
+            "annotations": ["works.hop.field.jdbc.annotation.Column(\"email_addr\")"]
+          },
+          {
+            "name": "address",
+            "annotations": ["works.hop.field.jdbc.annotation.Embedded"],
+            "type": {
+              "type": "record",
+              "name": "Address",
+              "fields": [
+                {
+                  "name": "city",
+                  "type": "string"
+                },
+                {
+                  "name": "state",
+                  "type": "String",
+                  "annotations": ["works.hop.field.jdbc.annotation.Column(\"state_prov\")"]
+                },
+                {
+                  "name": "zipCode",
+                  "type": "string",
+                  "annotations": ["works.hop.field.jdbc.annotation.Column(\"zip_code\")"]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

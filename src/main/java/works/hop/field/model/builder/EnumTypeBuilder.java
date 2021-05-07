@@ -17,6 +17,9 @@ public class EnumTypeBuilder extends AbstractTypeBuilder<Node> {
 
     @Override
     public Node build() {
-        return new Node(type, name, namespace);
+        Node node = new Node(type, name);
+        node.packageName = namespace;
+        node.symbols.addAll(enumSymbols);
+        return node;
     }
 }

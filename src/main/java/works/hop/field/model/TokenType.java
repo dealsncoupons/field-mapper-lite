@@ -9,7 +9,8 @@ public class TokenType {
     public static final String DEFAULT = "default";
     public static final String VALUES = "values";
     public static final String SYMBOLS = "symbols";
-    public static final String LOGICAL_TYPE = "logicalType";
+    public static final String ANNOTATIONS = "annotations";
+    public static final String LOGICAL_TYPE = "logicaltype";
     public static final String PRECISION = "precision";
     public static final String SCALE = "scale";
     public static final String TYPE = "type";

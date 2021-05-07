@@ -6,9 +6,9 @@ import works.hop.field.model.TypeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArrayTypeBuilder extends AbstractTypeBuilder<Node> {
+public class MapTypeBuilder extends AbstractTypeBuilder<Node> {
 
-    List<TypeBuilder<?>> arrayValues = new ArrayList<>();
+    List<TypeBuilder<?>> mapEntries = new ArrayList<>();
 
     @Override
     public Node build() {
