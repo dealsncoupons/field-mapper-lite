@@ -5,7 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'field-mapper-lite'
-include 'javro-entity-mapper'
-include 'javro-gen-plugin'
-
+rootProject.name = 'javro-entity-mapper'

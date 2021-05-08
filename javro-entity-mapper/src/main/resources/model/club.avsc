@@ -4,7 +4,7 @@
   "annotations": [
     "works.hop.field.jdbc.annotation.Table(\"tbl_club\")"
   ],
-  "namespace": "works.hop.field.jdbc.entity.avro",
+  "namespace": "works.hop.field.jdbc.entity",
   "fields": [
     {
       "name": "id",

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class Lexer {
@@ -49,12 +50,18 @@ public class Lexer {
     };
 
     public Lexer(String file) {
+        String source;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(file))))) {
-            this.input = readAllLines(reader);
+            source = readAllLines(reader);
         } catch (NullPointerException | IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+            try (BufferedReader reader = new BufferedReader(new FileReader(Paths.get(file).toFile()))) {
+                source = readAllLines(reader);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                throw new RuntimeException(ioe);
+            }
         }
+        this.input = source;
     }
 
     public Lexer(File file) {
@@ -66,6 +73,12 @@ public class Lexer {
         }
     }
 
+    public static void main(String[] args) {
+        Lexer gen = new Lexer("/model/ex1.avsc");
+        gen.parse();
+        System.out.println(gen.tokens);
+    }
+
     public String readAllLines(BufferedReader reader) throws IOException {
         StringBuilder lines = new StringBuilder();
         String line;
@@ -73,12 +86,6 @@ public class Lexer {
             lines.append(line).append("\n");
         }
         return lines.toString();
-    }
-
-    public static void main(String[] args) {
-        Lexer gen = new Lexer("/model/ex1.avsc");
-        gen.parse();
-        System.out.println(gen.tokens);
     }
 
     public List<Token> getTokens() {

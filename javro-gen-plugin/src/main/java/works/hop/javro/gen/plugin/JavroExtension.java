@@ -4,15 +4,16 @@ import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.provider.Property;
 
 import javax.inject.Inject;
+import java.io.File;
 
 public class JavroExtension {
 
-    final Property<String> sourceDir;
-    final Property<String> destDir;
+    Property<File> sourceDir;
+    Property<File> destDir;
 
     @Inject
     public JavroExtension(ObjectFactory objects) {
-        this.sourceDir = objects.property(String.class);
-        this.destDir = objects.property(String.class);;
+        this.sourceDir = objects.property(File.class);
+        this.destDir = objects.property(File.class);;
     }
 }

@@ -1,7 +1,10 @@
 {
   "type": "record",
-  "name": "MyMembership",
-  "namespace": "works.hop.field.jdbc.entity.avro.dto",
+  "name": "Membership",
+  "annotations": [
+    "works.hop.field.jdbc.annotation.Table(\"tbl_membership\")"
+  ],
+  "namespace": "works.hop.field.jdbc.entity",
   "fields": [
     {
       "name": "dateCreated",
@@ -19,20 +22,19 @@
     },
     {
       "name": "member",
-      "type": "works.hop.field.jdbc.entity.avro.Member",
+      "type": "java.util.UUID",
       "annotations": [
-        "works.hop.field.jdbc.annotation.JoinColumn(\"member_id\")"
+        "works.hop.field.jdbc.annotation.Id()",
+        "works.hop.field.jdbc.annotation.Column(\"member_id\")"
       ]
     },
     {
       "name": "club",
+      "type": "java.util.UUID",
       "annotations": [
-        "works.hop.field.jdbc.annotation.JoinColumn(value = \"club_id\", fkTable = \"tbl_membership\")"
-      ],
-      "type": {
-        "type": "array",
-        "items": "works.hop.field.jdbc.entity.avro.Club"
-      }
+        "works.hop.field.jdbc.annotation.Id()",
+        "works.hop.field.jdbc.annotation.Column(\"club_id\")"
+      ]
     },
     {
       "name": "alias",

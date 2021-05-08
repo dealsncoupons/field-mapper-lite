@@ -3,8 +3,8 @@ package works.hop.javro.gen.core;
 import com.squareup.javapoet.*;
 
 import javax.lang.model.element.Modifier;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class Generator {
 
     final Node node;
-    final String destDir;
+    final File destDir;
     final Map<String, TypeName> typeMap = new HashMap<>() {
         {
             put("null", null);
@@ -30,7 +30,7 @@ public class Generator {
         }
     };
 
-    public Generator(Node node, List<String> additionalTypes, String destDir) {
+    public Generator(Node node, List<String> additionalTypes, File destDir) {
         this.node = node;
         Map<String, TypeName> extraTypes = new HashMap<>();
         for (String type : additionalTypes) {
@@ -76,7 +76,7 @@ public class Generator {
             //field annotations
             List<AnnotationSpec> fieldAnnotations = new ArrayList<>();
             for (String annotationValue : fieldNode.annotations) {
-                String annotationName = substring(annotationValue, 0, annotationValue.indexOf("("));
+                String annotationName = truncate(annotationValue, annotationValue.indexOf("("));
                 String[] splitType = splitQualifiedName(annotationName);
                 AnnotationSpec.Builder annotationBuilder = AnnotationSpec.builder(
                         ClassName.get(splitType[0], splitType[1]));
@@ -116,7 +116,7 @@ public class Generator {
 
         //write to file system
         try {
-            javaFile.writeTo(Paths.get(destDir));
+            javaFile.writeTo(destDir);
         } catch (IOException e) {
             e.printStackTrace(System.err);
         }
@@ -139,7 +139,7 @@ public class Generator {
 
         //write to file system
         try {
-            javaFile.writeTo(Paths.get(destDir));
+            javaFile.writeTo(destDir);
         } catch (IOException e) {
             e.printStackTrace(System.err);
         }
@@ -167,7 +167,7 @@ public class Generator {
                 return FieldSpec.builder(
                         listType,
                         fieldNode.name,
-                        Modifier.PROTECTED)
+                        Modifier.PUBLIC)
                         .addAnnotations(fieldAnnotations)
                         .build();
             case TokenType.MAP:
@@ -177,14 +177,14 @@ public class Generator {
                 return FieldSpec.builder(
                         mapType,
                         fieldNode.name,
-                        Modifier.PROTECTED)
+                        Modifier.PUBLIC)
                         .addAnnotations(fieldAnnotations)
                         .build();
             default:
                 return FieldSpec.builder(
                         typeName(fieldNode.type),
                         fieldNode.name,
-                        Modifier.PROTECTED)
+                        Modifier.PUBLIC)
                         .addAnnotations(fieldAnnotations)
                         .build();
         }
@@ -218,10 +218,8 @@ public class Generator {
                 input.substring(1));
     }
 
-    private String substring(String input, int start, int end) {
-        if (end < 0) {
-            return input.substring(start);
-        } else return input.substring(start, end);
+    private String truncate(String input, int end) {
+        return end < 0 ? input : input.substring(0, end);
     }
 
     private String[] splitQualifiedName(String type) {

@@ -1,6 +1,6 @@
 package works.hop.javro.gen.core;
 
-import works.hop.dto.gen.builder.*;
+import works.hop.javro.gen.builder.*;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-import static works.hop.dto.gen.core.TokenType.*;
+import static works.hop.javro.gen.core.TokenType.*;
 
 public class Parser {
 
@@ -27,34 +27,41 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-        String defaultSrcDir = "/src/main/resources/model";
-        String defaultDestDir = "build/generated/sources/";
+        String defaultSrcDir = "javro-entity-mapper/src/main/resources/model";
+        String defaultDestDir = "javro-entity-mapper/src/main/java";
         String srcDir = args != null && args.length > 0 ? args[0] : defaultSrcDir;
         String destDir = args != null && args.length > 0 ? args[0] : defaultDestDir;
-        Parser.generateSources(srcDir, destDir);
+        Parser.generateJavro(srcDir, destDir);
     }
 
-    public static void generateSources(String srcDir, String destDir) {
-        File folder = Paths.get(System.getProperty("user.dir"), srcDir).toFile();
-        File[] listOfFiles = folder.listFiles((dir, name) -> name.endsWith(".avsc"));
+    public static void generateJavro(String srcDir, String destDir) {
+        generateJavroUsingDir(Paths.get(srcDir).toFile(), Paths.get(destDir).toFile());
+    }
+
+    public static void generateJavroUsingDir(File srcDir, File destDir) {
+        File[] listOfFiles = srcDir.listFiles((dir, name) -> name.endsWith(".avsc"));
 
         if (listOfFiles != null) {
             for (File sourceFile : listOfFiles) {
-                Lexer gen = new Lexer(sourceFile);
-                gen.parse();
-
-                Parser parser = new Parser(gen.getTokens());
-                parser.parse();
-
-                List<String> extraTypes = parser.getReadyList().stream().map(node ->
-                        parser.qualifiedTypeName(node.packageName, node.name)).collect(Collectors.toList());
-                for (Node node : parser.getReadyList()) {
-                    Generator generator = new Generator(node, extraTypes, destDir);
-                    generator.generate();
-                }
+                generateJavroUsingFile(sourceFile, destDir);
             }
         } else {
-            System.err.println("Could not locate or load source files from " + srcDir);
+            System.err.println("Could not find files from specified directory - '" + srcDir + "'");
+        }
+    }
+
+    public static void generateJavroUsingFile(File sourceFile, File outputDir) {
+        Lexer gen = new Lexer(sourceFile);
+        gen.parse();
+
+        Parser parser = new Parser(gen.getTokens());
+        parser.parse();
+
+        List<String> extraTypes = parser.getReadyList().stream().map(node ->
+                parser.qualifiedTypeName(node.packageName, node.name)).collect(Collectors.toList());
+        for (Node node : parser.getReadyList()) {
+            Generator generator = new Generator(node, extraTypes, outputDir);
+            generator.generate();
         }
     }
 
@@ -396,22 +403,6 @@ public class Parser {
                     builderStack.peek().type(recordType);
                     this.readyList.add(recordNode);
                     break;
-                case MAP:
-                    mapDefinition();
-                    MapTypeBuilder mapBuilder = (MapTypeBuilder) builderStack.pop();
-                    Node mapNode = mapBuilder.build();
-                    String mapType = qualifiedTypeName(mapNode.packageName != null ? mapNode.packageName : namespace, mapNode.values);
-                    builderStack.peek().type(mapNode.name);
-                    builderStack.peek().values(mapType);
-                    break;
-                case ARRAY:
-                    arrayDefinition();
-                    ArrayTypeBuilder arrayBuilder = (ArrayTypeBuilder) builderStack.pop();
-                    Node arrayNode = arrayBuilder.build();
-                    String arrayType = qualifiedTypeName(arrayNode.packageName != null ? arrayNode.packageName : namespace, arrayNode.items);
-                    builderStack.peek().type(arrayNode.name);
-                    builderStack.peek().items(arrayType);
-                    break;
                 case ENUM:
                     enumDefinition();
                     EnumTypeBuilder enumBuilder = (EnumTypeBuilder) builderStack.pop();
@@ -419,6 +410,20 @@ public class Parser {
                     String enumType = qualifiedTypeName(enumNode.packageName != null ? enumNode.packageName : namespace, enumNode.name);
                     builderStack.peek().type(enumType);
                     this.readyList.add(enumNode);
+                    break;
+                case MAP:
+                    mapDefinition();
+                    MapTypeBuilder mapBuilder = (MapTypeBuilder) builderStack.pop();
+                    Node mapNode = mapBuilder.build();
+                    builderStack.peek().type(mapNode.name);
+                    builderStack.peek().values(mapNode.values);
+                    break;
+                case ARRAY:
+                    arrayDefinition();
+                    ArrayTypeBuilder arrayBuilder = (ArrayTypeBuilder) builderStack.pop();
+                    Node arrayNode = arrayBuilder.build();
+                    builderStack.peek().type(arrayNode.name);
+                    builderStack.peek().items(arrayNode.items);
                     break;
                 default:
                     throw new RuntimeException("Encountered type '" + typeToHandle + "' which is not handled (yet)");

@@ -1,7 +1,6 @@
 package works.hop.javro.gen.builder;
 
 import works.hop.javro.gen.core.Node;
-import works.hop.dto.javro.core.TypeBuilder;
 import works.hop.javro.gen.core.TypeBuilder;
 
 import java.util.ArrayList;
