@@ -14,6 +14,7 @@ public class JavroExtension {
     @Inject
     public JavroExtension(ObjectFactory objects) {
         this.sourceDir = objects.property(File.class);
-        this.destDir = objects.property(File.class);;
+        this.destDir = objects.property(File.class);
+        ;
     }
 }

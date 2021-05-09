@@ -1,6 +1,6 @@
 package works.hop.field.fetcher;
 
-import works.hop.field.jdbc.example.ItemC;
+import works.hop.field.example.ItemC;
 
 public class FetchExample {
 

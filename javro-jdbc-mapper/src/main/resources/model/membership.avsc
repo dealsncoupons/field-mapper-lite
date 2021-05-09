@@ -1,0 +1,54 @@
+{
+  "type": "record",
+  "name": "Membership",
+  "annotations": [
+    "works.hop.javro.jdbc.annotation.Table(\"tbl_membership\")"
+  ],
+  "namespace": "works.hop.javro.jdbc.entity",
+  "fields": [
+    {
+      "name": "dateCreated",
+      "type": "java.time.LocalDate",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"date_created\")"
+      ]
+    },
+    {
+      "name": "lastUpdated",
+      "type": "java.time.LocalDateTime",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"last_updated\")"
+      ]
+    },
+    {
+      "name": "member",
+      "type": "java.util.UUID",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Id()",
+        "works.hop.javro.jdbc.annotation.Column(\"member_id\")"
+      ]
+    },
+    {
+      "name": "club",
+      "type": "java.util.UUID",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Id()",
+        "works.hop.javro.jdbc.annotation.Column(\"club_id\")"
+      ]
+    },
+    {
+      "name": "alias",
+      "type": "string",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"member_alias\")"
+      ]
+    },
+    {
+      "name": "status",
+      "type": "string",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"member_status\")"
+      ]
+    }
+  ]
+}

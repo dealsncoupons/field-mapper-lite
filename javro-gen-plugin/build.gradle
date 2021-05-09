@@ -19,12 +19,13 @@ dependencies {
     compile group: 'com.squareup', name: 'javapoet', version: '1.13.0'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.7.1'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
 }
 
 gradlePlugin {
     plugins {
-        generateJavro{
+        generateJavro {
             id = 'works.hop.javro-gen-plugin'
             implementationClass = "works.hop.javro.gen.plugin.JavroPlugin"
         }
