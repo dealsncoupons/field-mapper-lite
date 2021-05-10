@@ -22,7 +22,7 @@ public class AccountExample {
         createAccountWithMember(accountRepo);
     }
 
-    private static void createAccountWithMember(AccountRepo accountRepo){
+    private static void createAccountWithMember(AccountRepo accountRepo) {
         Member newMember = new Member();
         Address newAddress = new Address();
         newAddress.city = "Los Angeles";

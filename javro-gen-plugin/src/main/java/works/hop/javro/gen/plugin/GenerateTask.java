@@ -2,8 +2,8 @@ package works.hop.javro.gen.plugin;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 import works.hop.javro.gen.core.Parser;
 
@@ -12,10 +12,10 @@ import java.nio.file.Paths;
 
 public abstract class GenerateTask extends DefaultTask {
 
-    @InputFile
+    @InputDirectory
     public abstract Property<File> getSourceDir();
 
-    @OutputFile
+    @OutputDirectory
     public abstract Property<File> getDestDir();
 
     @TaskAction
@@ -26,6 +26,5 @@ public abstract class GenerateTask extends DefaultTask {
         File outputDir = getDestDir().getOrElse(defaultDestDir);
         System.out.printf("INPUT_DIR - %s, OUTPUT_DIR - %s%n", inputDir.getPath(), outputDir.getPath());
         Parser.generateJavroUsingDir(inputDir, outputDir);
-        System.out.println("WAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH!");
     }
 }

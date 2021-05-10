@@ -46,7 +46,7 @@ public interface CrudRepo<T, I> {
         return findById(id, (Class<T>) genericSuperclass.getActualTypeArguments()[0]);
     }
 
-    default Optional<T> findById(I id, Class<T> type) {
+    private Optional<T> findById(I id, Class<T> type) {
         String query = findByIdQuery(type);
         return Optional.ofNullable(SelectTemplate.selectOne(query, rs -> {
             AbstractResolver<T> entityFetcher = ReflectionUtil.resolverInstance(type);
@@ -55,7 +55,7 @@ public interface CrudRepo<T, I> {
         }, new Object[]{id}));
     }
 
-    default String findByIdQuery(Class<?> entityType) {
+    private String findByIdQuery(Class<?> entityType) {
         String tableName = getTableName(entityType);
         List<String> idColumns = getIdColumns(entityType);
         String idCriteria = idColumns.stream()
@@ -69,7 +69,7 @@ public interface CrudRepo<T, I> {
         return findByUnique(columnName, value, (Class<T>) genericSuperclass.getActualTypeArguments()[0]);
     }
 
-    default <V> Optional<T> findByUnique(String columnName, V value, Class<T> type) {
+    private <V> Optional<T> findByUnique(String columnName, V value, Class<T> type) {
         String query = findByUniqueQuery(type, columnName);
         return Optional.ofNullable(SelectTemplate.selectOne(query, rs -> {
             AbstractResolver<T> entityFetcher = ReflectionUtil.resolverInstance(type);
@@ -78,7 +78,7 @@ public interface CrudRepo<T, I> {
         }, new Object[]{value}));
     }
 
-    default String findByUniqueQuery(Class<?> entityType, String columnName) {
+    private String findByUniqueQuery(Class<?> entityType, String columnName) {
         String tableName = getTableName(entityType);
         return String.format("select * from %s where %s = ?", tableName, columnName);
     }
@@ -88,7 +88,7 @@ public interface CrudRepo<T, I> {
         return findAll(offset, limit, (Class<T>) genericSuperclass.getActualTypeArguments()[0]);
     }
 
-    default List<T> findAll(int offset, int limit, Class<?> type) {
+    private List<T> findAll(int offset, int limit, Class<?> type) {
         String query = findAllQuery(type, offset, limit);
         return (List<T>) SelectTemplate.selectList(query, (Function<ResultSet, Object>) rs -> {
             AbstractResolver<?> entityFetcher = ReflectionUtil.resolverInstance(type);

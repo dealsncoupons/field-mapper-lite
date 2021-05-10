@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'works.hop.javro-gen-plugin' version '1.0.0'
 }
 
 group 'works.hop'
@@ -15,25 +14,12 @@ dependencies {
     compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     compileOnly group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
 
-    compile group: 'com.google.guava', name: 'guava', version: '30.1-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '30.1-jre'
 
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
-    compile 'org.projectlombok:lombok:1.18.20'
+    compileOnly 'org.projectlombok:lombok:1.18.20'
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.7.1'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
-}
-
-generateJavro {
-    sourceDir = objects.property(File.class).value(file("build/generated-sources"))
-    destDir = objects.property(File.class).value(file("src/main/resources/model"))
-}
-
-sourceSets {
-    generated {
-        java.srcDirs "${buildDir}/generated-sources"
-    }
-    // set up a dependency for the main sourceSet on the generated sourceSet
-    main.compileClasspath += generated.output
 }

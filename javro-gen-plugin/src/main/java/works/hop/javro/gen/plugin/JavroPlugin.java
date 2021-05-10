@@ -7,7 +7,7 @@ public class JavroPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        project.getExtensions().create("generateJavro", JavroExtension.class);
-        project.getTasks().create("generateJavro", GenerateTask.class);
+        project.getExtensions().create("generator", JavroExtension.class);
+        project.getTasks().register("generateJavro", GenerateTask.class);
     }
 }

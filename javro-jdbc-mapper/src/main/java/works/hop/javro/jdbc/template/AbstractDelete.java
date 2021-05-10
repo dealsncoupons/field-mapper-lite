@@ -2,7 +2,6 @@ package works.hop.javro.jdbc.template;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import works.hop.javro.jdbc.annotation.Embedded;
 import works.hop.javro.jdbc.annotation.Id;
 import works.hop.javro.jdbc.annotation.JoinColumn;
 import works.hop.javro.jdbc.reflect.ReflectionUtil;

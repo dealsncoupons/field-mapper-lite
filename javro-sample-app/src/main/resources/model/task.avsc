@@ -1,0 +1,37 @@
+{
+  "type": "record",
+  "namespace": "works.hop.sample.app.model",
+  "annotations": ["works.hop.javro.jdbc.annotation.Table(\"tbl_task\")"],
+  "name": "Task",
+  "doc": "A task with sub-tasks",
+  "fields": [
+    {
+      "type": "java.util.UUID",
+      "name": "id",
+      "annotations": ["works.hop.javro.jdbc.annotation.Id"],
+      "doc": "The primary key identifier for the task"
+    },
+    {
+      "type": "string",
+      "name": "name",
+      "doc": "The description of the task"
+    },
+    {
+      "type": "boolean",
+      "name": "completed",
+      "doc": "Indicates if the task is completed"
+    },
+    {
+      "type": "java.time.LocalDate",
+      "name": "dateCreated",
+      "annotations": ["works.hop.javro.jdbc.annotation.Column(\"date_created\")"],
+      "doc": "Commencement date of the task"
+    },
+    {
+      "type": "java.util.UUID",
+      "name": "parentTask",
+      "annotations": ["works.hop.javro.jdbc.annotation.Column(\"parent_task\")"],
+      "doc": "The parent task's id"
+    }
+  ]
+}
