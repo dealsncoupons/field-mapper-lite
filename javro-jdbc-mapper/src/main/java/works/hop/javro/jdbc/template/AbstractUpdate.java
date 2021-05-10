@@ -16,10 +16,10 @@ import static works.hop.javro.jdbc.reflect.ReflectionUtil.*;
 public class AbstractUpdate {
 
     static final Logger log = LoggerFactory.getLogger(AbstractUpdate.class);
-    public final Map<String, Object> fields = new HashMap<>();
-    public final Map<String, Object> idFields = new HashMap<>();
-    public final Map<String, AbstractUpdate> joinFields = new HashMap<>();
-    public final Map<String, List<AbstractUpdate>> collectionJoinFields = new HashMap<>();
+    public final Map<String, Object> fields = new LinkedHashMap<>();
+    public final Map<String, Object> idFields = new LinkedHashMap<>();
+    public final Map<String, AbstractUpdate> joinFields = new LinkedHashMap<>();
+    public final Map<String, List<AbstractUpdate>> collectionJoinFields = new LinkedHashMap<>();
 
     public AbstractUpdate(Object entity) {
         Class<?> targetClass = entity.getClass();
@@ -32,7 +32,6 @@ public class AbstractUpdate {
                     if (embeddedFieldValue != null) {
                         AbstractUpdate abstractUpdate = new AbstractUpdate(embeddedFieldValue);
                         this.fields.putAll(abstractUpdate.fields);
-                        this.idFields.putAll(abstractUpdate.idFields);
                         log.info("Added embedded field '{}' in entity object", embeddedFieldName);
                     }
                 } else if (field.isAnnotationPresent(Id.class)) {
@@ -50,8 +49,13 @@ public class AbstractUpdate {
                             Object joinColumnFieldValue = getFieldValue(field, entity);
                             if (joinColumnFieldValue != null) {
                                 this.joinFields.put(joinColumnName, new AbstractUpdate(joinColumnFieldValue));
-                                Object idColumnValue = getIdColumnValue(joinColumnName, joinColumnFieldValue.getClass(), joinColumnFieldValue);
-                                if (idColumnValue != null) this.fields.put(joinColumnName, idColumnValue);
+                                Map<String, Optional<Object>> idColumnValues =
+                                        getIdColumnValues(joinColumnFieldValue.getClass(), joinColumnFieldValue);
+                                if (!idColumnValues.isEmpty()) {
+                                    idColumnValues.forEach((key, value) -> {
+                                        value.ifPresent(o -> this.fields.put(joinColumnName, o));
+                                    });
+                                }
                             }
                         } else {
                             Collection<?> joinColumnFieldValue = (Collection<?>) getFieldValue(field, entity);

@@ -24,19 +24,21 @@ public interface CrudRepo<T, I> {
         return InsertTemplate.insertOne(entity);
     }
 
-    default T update(T entity) {
-        //TODO: implement this
-        return null;
+    default void update(T entity) {
+        UpdateTemplate.updateOne(entity);
     }
 
     default T deleteById(I id) {
-        //TODO: implement this
-        return null;
+        Optional<T> search = findById(id);
+        if (search.isPresent()) {
+            DeleteTemplate.deleteOne(search.get());
+            return search.get();
+        }
+        throw new RuntimeException("Delete operation failed - No entity exists with given id");
     }
 
-    default int delete(T entity) {
-        //TODO: implement this
-        return -1;
+    default void delete(T entity) {
+        DeleteTemplate.deleteOne(entity);
     }
 
     default Optional<T> findById(I id) {

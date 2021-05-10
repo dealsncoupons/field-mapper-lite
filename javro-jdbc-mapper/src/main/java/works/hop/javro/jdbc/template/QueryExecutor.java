@@ -12,12 +12,12 @@ public interface QueryExecutor {
 
     Logger log = LoggerFactory.getLogger(QueryExecutor.class);
 
-    default <E> void executeUpdate(String query, Object[] args) {
+    default void executeUpdate(String query, Object[] args) {
         Connection conn = null;
         try {
             conn = ConnectionProvider.getConnection();
             conn.setAutoCommit(false);
-            executeWithParameters(conn, query, args);
+            executeQuery(conn, query, args);
             conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -41,7 +41,7 @@ public interface QueryExecutor {
         }
     }
 
-    default void executeWithParameters(Connection conn, String query, Object[] args) throws SQLException {
+    default void executeQuery(Connection conn, String query, Object[] args) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(query)) {
             AtomicInteger index = new AtomicInteger(1);
             for (Object param : args) {

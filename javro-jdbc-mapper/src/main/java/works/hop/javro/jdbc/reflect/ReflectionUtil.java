@@ -47,6 +47,21 @@ public class ReflectionUtil {
         return Stream.of(List.class, Set.class, Queue.class).anyMatch(fieldType -> field.getType().isAssignableFrom(fieldType));
     }
 
+    public static List<Field> getJoinColumnFields(Class<?> type) {
+        List<Field> annotatedFields = new ArrayList<>();
+        for (Field field : type.getDeclaredFields()) {
+            if (isAcceptableField(field)) {
+                if (field.isAnnotationPresent(JoinColumn.class)) {
+                    annotatedFields.add(field);
+                }
+            }
+        }
+        if (type.getSuperclass() != Object.class) {
+            annotatedFields.addAll(getJoinColumnFields(type.getSuperclass()));
+        }
+        return annotatedFields;
+    }
+
     public static Object getFieldValue(Field field, Object source) {
         boolean isAccessible = field.canAccess(source);
         try {
@@ -92,19 +107,15 @@ public class ReflectionUtil {
         return idColumns;
     }
 
-    public static Object getIdColumnValue(final String columnName, Class<?> entityClass, Object entity) {
-        List<Object> idColumns =
+    public static Map<String, Optional<Object>> getIdColumnValues(Class<?> entityClass, Object entity) {
+        Map<String, Optional<Object>> idColumns =
                 Arrays.stream(entityClass.getDeclaredFields())
                         .filter(field -> field.isAnnotationPresent(Id.class))
-                        .filter(field -> {
-                            if (field.isAnnotationPresent(Column.class)) {
-                                return field.getAnnotation(Column.class).value().equals(columnName);
-                            } else return field.getName().equals(columnName);
-                        }).map(field -> getFieldValue(field, entity)).collect(Collectors.toList());
+                        .collect(Collectors.toMap(Field::getName, field -> Optional.ofNullable(getFieldValue(field, entity))));
         if (idColumns.isEmpty() && entityClass.getSuperclass() != null) {
-            return getIdColumnValue(columnName, entityClass.getSuperclass(), entity);
+            idColumns.putAll(getIdColumnValues(entityClass.getSuperclass(), entity));
         }
-        return !idColumns.isEmpty() ? idColumns.get(0) : null;
+        return idColumns;
     }
 
     public static <E> void setIdValue(Class<?> entityClass, E entity, UUID uuid) {
@@ -132,6 +143,18 @@ public class ReflectionUtil {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
             throw new RuntimeException("Could not create entity instance", e);
+        }
+    }
+
+    public static Collection<Object> newCollectionInstance(Class<?> type) {
+        if (List.class.isAssignableFrom(type)) {
+            return new ArrayList<>();
+        } else if (Set.class.isAssignableFrom(type)) {
+            return new HashSet<>();
+        } else if (Queue.class.isAssignableFrom(type)) {
+            return new LinkedList<>();
+        } else {
+            throw new RuntimeException("Could not determine instance type for collection instance");
         }
     }
 }

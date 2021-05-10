@@ -15,24 +15,16 @@ import static works.hop.javro.jdbc.reflect.ReflectionUtil.*;
 public class AbstractDelete {
 
     static final Logger log = LoggerFactory.getLogger(AbstractDelete.class);
-    public final Map<String, Object> idFields = new HashMap<>();
-    public final Map<String, AbstractDelete> joinFields = new HashMap<>();
-    public final Map<String, List<AbstractDelete>> collectionJoinFields = new HashMap<>();
+    public final Map<String, Object> idFields = new LinkedHashMap<>();
+    public final Map<String, AbstractDelete> joinFields = new LinkedHashMap<>();
+    public final Map<String, List<AbstractDelete>> collectionJoinFields = new LinkedHashMap<>();
 
     public AbstractDelete(Object entity) {
         Class<?> targetClass = entity.getClass();
         do {
             Field[] fields = targetClass.getDeclaredFields();
             Arrays.stream(fields).filter(ReflectionUtil::isAcceptableField).forEach(field -> {
-                if (field.isAnnotationPresent(Embedded.class)) {
-                    String embeddedFieldName = getColumnName(field);
-                    Object embeddedFieldValue = getFieldValue(field, entity);
-                    if (embeddedFieldValue != null) {
-                        AbstractDelete abstractUpdate = new AbstractDelete(embeddedFieldValue);
-                        this.idFields.putAll(abstractUpdate.idFields);
-                        log.info("Added embedded field '{}' in entity object", embeddedFieldName);
-                    }
-                } else if (field.isAnnotationPresent(Id.class)) {
+                if (field.isAnnotationPresent(Id.class)) {
                     String columnName = getColumnName(field);
                     this.idFields.put(columnName, getFieldValue(field, entity));
                 } else if (field.isAnnotationPresent(JoinColumn.class)) {

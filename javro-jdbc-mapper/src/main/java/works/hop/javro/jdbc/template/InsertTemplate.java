@@ -3,15 +3,13 @@ package works.hop.javro.jdbc.template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static works.hop.javro.jdbc.reflect.ReflectionUtil.getTableName;
-import static works.hop.javro.jdbc.reflect.ReflectionUtil.setIdValue;
+import static works.hop.javro.jdbc.reflect.ReflectionUtil.*;
 
 public class InsertTemplate {
 
@@ -31,12 +29,12 @@ public class InsertTemplate {
             E insertResult = insertInTransaction(entity, conn);
             conn.commit();
             return insertResult;
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             if (conn != null) {
                 try {
                     conn.rollback();
-                } catch (SQLException sqle) {
+                } catch (Exception sqle) {
                     log.error("Failed to rollback transaction", sqle);
                 }
             }
@@ -46,7 +44,7 @@ public class InsertTemplate {
                 try {
                     conn.setAutoCommit(true);
                     conn.close();
-                } catch (SQLException sqle) {
+                } catch (Exception sqle) {
                     log.error("Failed to commit transaction", sqle);
                 }
             }
@@ -54,12 +52,43 @@ public class InsertTemplate {
     }
 
     private static <E> E insertInTransaction(E entity, Connection connection) {
+        List<Field> joinColumnFields = getJoinColumnFields(entity.getClass());
+        if (!joinColumnFields.isEmpty()) {
+            for (Field field : joinColumnFields) {
+                if (isCollectionField(field)) {
+                    List<Object> joinColumnCollection = (List<Object>) getFieldValue(field, entity);
+                    if (joinColumnCollection != null) {
+                        Collection<Object> savedJoinCollection = newCollectionInstance(field.getType());
+                        for (Object collectionValue : joinColumnCollection) {
+                            Object savedCollectionValue = insertInTransaction(collectionValue, connection);
+                            savedJoinCollection.add(savedCollectionValue);
+                        }
+                        set(field, entity, savedJoinCollection);
+                    }
+                } else {
+                    Object joinColumnValue = getFieldValue(field, entity);
+                    if (joinColumnValue != null) {
+                        Object savedJoinColumnValue = insertInTransaction(joinColumnValue, connection);
+                        if (savedJoinColumnValue != null) {
+                            set(field, entity, savedJoinColumnValue);
+                        }
+                    }
+                }
+            }
+        } else {
+            return doInsertInTransaction(entity, connection);
+        }
+        return doInsertInTransaction(entity, connection);
+    }
+
+    private static <E> E doInsertInTransaction(E entity, Connection connection) {
         AbstractInsert abstractInsert = new AbstractInsert(entity);
-        Map<String, Object> fields = abstractInsert.fields.entrySet().stream().filter(entry -> entry.getValue() != null)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, Object> fields = abstractInsert.fields;
+
         String query = prepareQuery(getTableName(entity.getClass()), fields);
 
         try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
             AtomicInteger index = new AtomicInteger(1);
             for (String fieldName : fields.keySet()) {
                 ps.setObject(index.getAndIncrement(), fields.get(fieldName));
@@ -77,13 +106,6 @@ public class InsertTemplate {
                 log.warn("Could not retrieve generated id value", e);
             }
 
-            if (!abstractInsert.joinFields.isEmpty()) {
-                abstractInsert.joinFields.forEach((s, joinField) -> insertInTransaction(joinField, connection));
-            }
-            if (!abstractInsert.collectionJoinFields.isEmpty()) {
-                abstractInsert.collectionJoinFields.values().forEach(items ->
-                        items.forEach(item -> insertInTransaction(item, connection)));
-            }
             return entity;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -92,7 +114,8 @@ public class InsertTemplate {
     }
 
     public static Object executeUpdate(String queryString, Object[] args) {
-        new QueryExecutor(){}.executeUpdate(queryString, args);
+        new QueryExecutor() {
+        }.executeUpdate(queryString, args);
         return 1;
     }
 }

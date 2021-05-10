@@ -19,6 +19,6 @@ public class UpdateTemplateTest {
         Map<String, Object> idFields = Map.of("id", UUID.randomUUID());
         String query = UpdateTemplate.prepareQuery(tableName, idFields, fields);
         System.out.println(query);
-        assertEquals(query, "update testTable set name = ?, age = ? where id = ?");
+        assertEquals(query, "update testTable set name = ?, age = ? where id = ?::uuid");
     }
 }

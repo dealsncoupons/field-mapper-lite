@@ -19,7 +19,10 @@ public class AccountExample {
             Optional<Account> account1 = accountRepo.findById(found.id);
             account1.ifPresent(System.out::println);
         });
+        createAccountWithMember(accountRepo);
+    }
 
+    private static void createAccountWithMember(AccountRepo accountRepo){
         Member newMember = new Member();
         Address newAddress = new Address();
         newAddress.city = "Los Angeles";
@@ -38,5 +41,23 @@ public class AccountExample {
         Account savedAccount = accountRepo.save(newAccount);
         System.out.println("Created account id - " + savedAccount.id);
         System.out.println("Created member id - " + savedAccount.member.id);
+
+        //update both account and member
+        savedAccount.member.address.city = "Chicago";
+        savedAccount.member.address.state = "IL";
+        savedAccount.member.address.zipCode = "60606";
+
+        savedAccount.accessCode = "abc-xyz";
+        savedAccount.username = "washa";
+        accountRepo.update(savedAccount);
+
+        //retrieve updated account
+        Optional<Account> updatedAccount = accountRepo.findById(savedAccount.id);
+        updatedAccount.ifPresent(account -> System.out.println("Created account id - " + account.username));
+
+        //delete account record
+        Account deletedAccount = accountRepo.deleteById(savedAccount.id);
+        System.out.println("Created account id - " + deletedAccount.id);
+        System.out.println("Created member id - " + deletedAccount.member.id);
     }
 }

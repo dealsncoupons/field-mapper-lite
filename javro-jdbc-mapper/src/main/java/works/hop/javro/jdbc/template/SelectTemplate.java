@@ -28,7 +28,7 @@ public class SelectTemplate {
                     }
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Problem executing fetch query", e);
         }
@@ -49,7 +49,7 @@ public class SelectTemplate {
                     return entities;
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Problem executing fetch query", e);
         }
