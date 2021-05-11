@@ -39,7 +39,7 @@ public class MyMembership {
     this.dateCreated = dateCreated;
   }
 
-  public LocalDate setDateCreated() {
+  public LocalDate getDateCreated() {
     return this.dateCreated;
   }
 
@@ -47,7 +47,7 @@ public class MyMembership {
     this.lastUpdated = lastUpdated;
   }
 
-  public LocalDateTime setLastUpdated() {
+  public LocalDateTime getLastUpdated() {
     return this.lastUpdated;
   }
 
@@ -55,7 +55,7 @@ public class MyMembership {
     this.member = member;
   }
 
-  public Member setMember() {
+  public Member getMember() {
     return this.member;
   }
 
@@ -63,7 +63,7 @@ public class MyMembership {
     this.club = club;
   }
 
-  public List<Club> setClub() {
+  public List<Club> getClub() {
     return this.club;
   }
 
@@ -71,7 +71,7 @@ public class MyMembership {
     this.alias = alias;
   }
 
-  public String setAlias() {
+  public String getAlias() {
     return this.alias;
   }
 
@@ -79,7 +79,7 @@ public class MyMembership {
     this.status = status;
   }
 
-  public String setStatus() {
+  public String getStatus() {
     return this.status;
   }
 }

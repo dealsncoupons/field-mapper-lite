@@ -1,8 +1,7 @@
-package works.hop.javro.jdbc.sample;
+package works.hop.javro.jdbc.sample.account;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public interface IAccount {

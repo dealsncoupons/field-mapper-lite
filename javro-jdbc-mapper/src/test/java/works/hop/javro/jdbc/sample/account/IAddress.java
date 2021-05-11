@@ -1,4 +1,4 @@
-package works.hop.javro.jdbc.sample;
+package works.hop.javro.jdbc.sample.account;
 
 public interface IAddress {
     String getCity();

@@ -31,7 +31,7 @@ public class Club {
     this.id = id;
   }
 
-  public UUID setId() {
+  public UUID getId() {
     return this.id;
   }
 
@@ -39,7 +39,7 @@ public class Club {
     this.dateCreated = dateCreated;
   }
 
-  public LocalDate setDateCreated() {
+  public LocalDate getDateCreated() {
     return this.dateCreated;
   }
 
@@ -47,7 +47,7 @@ public class Club {
     this.lastUpdated = lastUpdated;
   }
 
-  public LocalDateTime setLastUpdated() {
+  public LocalDateTime getLastUpdated() {
     return this.lastUpdated;
   }
 
@@ -55,7 +55,7 @@ public class Club {
     this.title = title;
   }
 
-  public String setTitle() {
+  public String getTitle() {
     return this.title;
   }
 
@@ -63,7 +63,7 @@ public class Club {
     this.activity = activity;
   }
 
-  public String setActivity() {
+  public String getActivity() {
     return this.activity;
   }
 }

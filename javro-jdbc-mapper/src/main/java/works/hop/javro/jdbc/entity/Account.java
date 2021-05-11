@@ -36,7 +36,7 @@ public class Account {
     this.id = id;
   }
 
-  public UUID setId() {
+  public UUID getId() {
     return this.id;
   }
 
@@ -44,7 +44,7 @@ public class Account {
     this.dateCreated = dateCreated;
   }
 
-  public LocalDate setDateCreated() {
+  public LocalDate getDateCreated() {
     return this.dateCreated;
   }
 
@@ -52,7 +52,7 @@ public class Account {
     this.lastUpdated = lastUpdated;
   }
 
-  public LocalDateTime setLastUpdated() {
+  public LocalDateTime getLastUpdated() {
     return this.lastUpdated;
   }
 
@@ -60,7 +60,7 @@ public class Account {
     this.username = username;
   }
 
-  public String setUsername() {
+  public String getUsername() {
     return this.username;
   }
 
@@ -68,7 +68,7 @@ public class Account {
     this.accessCode = accessCode;
   }
 
-  public String setAccessCode() {
+  public String getAccessCode() {
     return this.accessCode;
   }
 
@@ -76,7 +76,7 @@ public class Account {
     this.member = member;
   }
 
-  public Member setMember() {
+  public Member getMember() {
     return this.member;
   }
 }

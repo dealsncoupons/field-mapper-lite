@@ -1,10 +1,8 @@
-package works.hop.javro.jdbc.sample;
+package works.hop.javro.jdbc.sample.todo;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +11,8 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class ResultSetSingleRow {
@@ -21,13 +20,13 @@ public class ResultSetSingleRow {
     Map<String, Object> task = new HashMap<>();
 
     @Before
-    public void setUp(){
+    public void setUp() {
         task.put("name", "make breakfast");
         task.put("completed", false);
     }
 
     @After
-    public void tearDown(){
+    public void tearDown() {
         task.clear();
     }
 
@@ -45,7 +44,7 @@ public class ResultSetSingleRow {
     @Test
     public void testValuesFromResultSet() throws SQLException {
         ResultSet rs = mockResultSet();
-        if(rs.next()){
+        if (rs.next()) {
             String name = rs.getObject("name", String.class);
             assertEquals(name, "make breakfast");
             Boolean completed = rs.getObject("completed", Boolean.class);

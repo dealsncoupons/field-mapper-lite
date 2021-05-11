@@ -20,7 +20,7 @@ public class Address {
     this.city = city;
   }
 
-  public String setCity() {
+  public String getCity() {
     return this.city;
   }
 
@@ -28,7 +28,7 @@ public class Address {
     this.state = state;
   }
 
-  public String setState() {
+  public String getState() {
     return this.state;
   }
 
@@ -36,7 +36,7 @@ public class Address {
     this.zipCode = zipCode;
   }
 
-  public String setZipCode() {
+  public String getZipCode() {
     return this.zipCode;
   }
 }

@@ -1,4 +1,4 @@
-package works.hop.javro.jdbc.sample;
+package works.hop.javro.jdbc.sample.todo;
 
 import org.junit.After;
 import org.junit.Before;

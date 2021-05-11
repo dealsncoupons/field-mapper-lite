@@ -38,7 +38,7 @@ public class Membership {
     this.dateCreated = dateCreated;
   }
 
-  public LocalDate setDateCreated() {
+  public LocalDate getDateCreated() {
     return this.dateCreated;
   }
 
@@ -46,7 +46,7 @@ public class Membership {
     this.lastUpdated = lastUpdated;
   }
 
-  public LocalDateTime setLastUpdated() {
+  public LocalDateTime getLastUpdated() {
     return this.lastUpdated;
   }
 
@@ -54,7 +54,7 @@ public class Membership {
     this.member = member;
   }
 
-  public UUID setMember() {
+  public UUID getMember() {
     return this.member;
   }
 
@@ -62,7 +62,7 @@ public class Membership {
     this.club = club;
   }
 
-  public UUID setClub() {
+  public UUID getClub() {
     return this.club;
   }
 
@@ -70,7 +70,7 @@ public class Membership {
     this.alias = alias;
   }
 
-  public String setAlias() {
+  public String getAlias() {
     return this.alias;
   }
 
@@ -78,7 +78,7 @@ public class Membership {
     this.status = status;
   }
 
-  public String setStatus() {
+  public String getStatus() {
     return this.status;
   }
 }

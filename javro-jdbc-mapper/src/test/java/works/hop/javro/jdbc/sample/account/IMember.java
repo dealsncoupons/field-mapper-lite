@@ -1,4 +1,4 @@
-package works.hop.javro.jdbc.sample;
+package works.hop.javro.jdbc.sample.account;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

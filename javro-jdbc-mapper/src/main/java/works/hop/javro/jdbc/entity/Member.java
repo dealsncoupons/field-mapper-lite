@@ -37,7 +37,7 @@ public class Member {
     this.id = id;
   }
 
-  public UUID setId() {
+  public UUID getId() {
     return this.id;
   }
 
@@ -45,7 +45,7 @@ public class Member {
     this.dateCreated = dateCreated;
   }
 
-  public LocalDate setDateCreated() {
+  public LocalDate getDateCreated() {
     return this.dateCreated;
   }
 
@@ -53,7 +53,7 @@ public class Member {
     this.lastUpdated = lastUpdated;
   }
 
-  public LocalDateTime setLastUpdated() {
+  public LocalDateTime getLastUpdated() {
     return this.lastUpdated;
   }
 
@@ -61,7 +61,7 @@ public class Member {
     this.fullName = fullName;
   }
 
-  public String setFullName() {
+  public String getFullName() {
     return this.fullName;
   }
 
@@ -69,7 +69,7 @@ public class Member {
     this.emailAddr = emailAddr;
   }
 
-  public String setEmailAddr() {
+  public String getEmailAddr() {
     return this.emailAddr;
   }
 
@@ -77,7 +77,7 @@ public class Member {
     this.address = address;
   }
 
-  public Address setAddress() {
+  public Address getAddress() {
     return this.address;
   }
 }
