@@ -45,11 +45,17 @@ public class Generator {
         if ("enum".equals(node.type)) {
             generateEnum();
         } else {
-            generateClass();
+            generateEntityInterface();
+            generateEntityPojo();
         }
     }
 
-    public void generateClass() {
+
+    public void generateEntityInterface(){
+
+    }
+
+    public void generateEntityPojo() {
         //class annotations
         List<AnnotationSpec> classAnnotations = new ArrayList<>();
         for (String annotationValue : node.annotations) {
@@ -100,7 +106,7 @@ public class Generator {
             builder.addMethod(setter);
 
             //add getter
-            MethodSpec getter = MethodSpec.methodBuilder("set" + capitalize(fieldNode.name))
+            MethodSpec getter = MethodSpec.methodBuilder("get" + capitalize(fieldNode.name))
                     .addModifiers(Modifier.PUBLIC)
                     .returns(createFieldType(fieldNode))
                     .addStatement("return this.$L", fieldNode.name)
