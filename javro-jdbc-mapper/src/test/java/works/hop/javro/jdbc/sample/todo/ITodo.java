@@ -1,11 +1,11 @@
 package works.hop.javro.jdbc.sample.todo;
 
-import works.hop.javro.jdbc.sample.Accessible;
+import works.hop.javro.jdbc.sample.Unreflect;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 
-public interface ITodo extends Accessible {
+public interface ITodo extends Unreflect {
 
     UUID getId();
 
@@ -19,7 +19,11 @@ public interface ITodo extends Accessible {
 
     void setCompleted(Boolean completed);
 
-    List<ITodo> getSubTasks();
+    ITodo getNextTask();
 
-    void setSubTasks(List<ITodo> subTasks);
+    void setNextTask(ITodo nextTask);
+
+    ArrayList<ITodo> getSubTasks();
+
+    void setSubTasks(ArrayList<ITodo> subTasks);
 }

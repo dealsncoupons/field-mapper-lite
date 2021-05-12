@@ -5,7 +5,6 @@ import works.hop.javro.jdbc.sample.account.IAccount;
 import works.hop.javro.jdbc.sample.account.IAddress;
 import works.hop.javro.jdbc.sample.account.IMember;
 import works.hop.javro.jdbc.sample.todo.ITodo;
-import works.hop.javro.jdbc.sample.todo.Todo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,16 +16,16 @@ import java.util.function.Supplier;
 public class EntityMetadata {
 
     public static Function<Class<?>, EntityInfo> getEntityInfo = entityType -> {
-        if (IAccount.class.equals(entityType)) {
+        if (IAccount.class.isAssignableFrom(entityType)) {
             return accountInfo().get();
         }
-        if (IMember.class.equals(entityType)) {
+        if (IMember.class.isAssignableFrom(entityType)) {
             return memberInfo().get();
         }
-        if (IAddress.class.equals(entityType)) {
+        if (IAddress.class.isAssignableFrom(entityType)) {
             return addressInfo().get();
         }
-        if(Todo.class.equals(entityType)){
+        if (ITodo.class.isAssignableFrom(entityType)) {
             return todoInfo().get();
         }
         throw new RuntimeException("Unknown entity type - " + entityType.getName());
@@ -60,10 +59,11 @@ public class EntityMetadata {
     }
 
     private static Supplier<EntityInfo> todoInfo() {
-        FieldInfo city = new FieldInfo(true, UUID.class, "id", "id");
-        FieldInfo state = new FieldInfo(String.class, "name", "name");
-        FieldInfo zip = new FieldInfo(Boolean.class, "completed", "completed");
+        FieldInfo id = new FieldInfo(true, UUID.class, "id", "id");
+        FieldInfo name = new FieldInfo(String.class, "name", "name");
+        FieldInfo done = new FieldInfo(Boolean.class, "completed", "completed");
+        FieldInfo next = new FieldInfo(ITodo.class, "nextTask", "next_task", true, false, "");
         FieldInfo subTasks = new FieldInfo(ITodo.class, "subTasks", "parent_task", true, true, "");
-        return () -> new EntityInfo("tbl_task", List.of(city, state, zip, subTasks));
+        return () -> new EntityInfo("tbl_task", List.of(id, name, done, next, subTasks));
     }
 }

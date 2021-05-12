@@ -1,6 +1,6 @@
 package works.hop.javro.jdbc.sample;
 
-public interface Accessible {
+public interface Unreflect {
 
     default <O> O get(String property){return null;};
 

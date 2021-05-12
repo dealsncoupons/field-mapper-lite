@@ -3,7 +3,6 @@ package works.hop.javro.jdbc.sample.todo;
 import works.hop.javro.jdbc.annotation.Table;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Table("tbl_task")
@@ -12,7 +11,8 @@ public class Todo implements ITodo {
     UUID id;
     String name;
     Boolean completed;
-    List<ITodo> subTasks = new ArrayList<>();
+    ITodo nextTask;
+    ArrayList<ITodo> subTasks = new ArrayList<>();
 
     public Todo() {
         this(null, null, null);
@@ -59,12 +59,22 @@ public class Todo implements ITodo {
     }
 
     @Override
-    public List<ITodo> getSubTasks() {
+    public ITodo getNextTask() {
+        return this.nextTask;
+    }
+
+    @Override
+    public void setNextTask(ITodo nextTask) {
+        this.nextTask = nextTask;
+    }
+
+    @Override
+    public ArrayList<ITodo> getSubTasks() {
         return this.subTasks;
     }
 
     @Override
-    public void setSubTasks(List<ITodo> subTasks) {
+    public void setSubTasks(ArrayList<ITodo> subTasks) {
         this.subTasks = subTasks;
     }
 }

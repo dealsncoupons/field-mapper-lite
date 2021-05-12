@@ -3,6 +3,8 @@ package works.hop.javro.jdbc.sample.todo;
 import works.hop.javro.jdbc.sample.EntityProxyFactory;
 import works.hop.javro.jdbc.sample.EntitySourceFactory;
 import works.hop.javro.jdbc.sample.template.InsertTemplate;
+import works.hop.javro.jdbc.sample.template.SelectTemplate;
+import works.hop.javro.jdbc.sample.template.UpdateTemplate;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,10 +15,10 @@ public class TodosApp {
 
     public static void main(String[] args) {
         //createEntityProxies();
-//        createEntitySources();
-        ITodo task1 = new Todo("make marmalade", false);
-        ITodo saved = InsertTemplate.insertOne(task1);
-        System.out.println("saved -> " + saved.getName());
+        createEntitySources();
+//        ITodo task1 = new Todo("make marmalade", false);
+//        ITodo saved = InsertTemplate.insertOne(task1);
+//        System.out.println("saved -> " + saved.getId());
     }
 
     public static void createEntitySources() {
@@ -28,16 +30,31 @@ public class TodosApp {
         Todo task123 = new Todo("cook to golden brown", false);
         Todo task13 = new Todo("serve when ready", false);
 
-        task1.getSubTasks().add(EntitySourceFactory.create(task11));
-        task1.getSubTasks().add(EntitySourceFactory.create(task12));
-        task1.getSubTasks().add(EntitySourceFactory.create(task13));
+        task1.getSubTasks().add(task11);
+        task1.getSubTasks().add(task12);
+        task1.getSubTasks().add(task13);
 
-        task12.getSubTasks().add(EntitySourceFactory.create(task121));
-        task12.getSubTasks().add(EntitySourceFactory.create(task122));
-        task12.getSubTasks().add(EntitySourceFactory.create(task123));
+        task12.getSubTasks().add(task121);
+        task12.getSubTasks().add(task122);
+        task12.getSubTasks().add(task123);
 
         ITodo theTask = EntitySourceFactory.create(task1);
         printTasks("", List.of(theTask));
+        ITodo saved = InsertTemplate.insertOne(task1);
+        System.out.println("saved -> " + saved.getId());
+
+        //select task just created
+        ITodo findTask = SelectTemplate.selectOne(ITodo.class, new Object[]{saved.getId()});
+        System.out.println("selected -> " + findTask.getId());
+
+        //modify found task
+        findTask.setNextTask(task11);
+        findTask.getSubTasks().remove(0);
+
+        //updated modified task
+        UpdateTemplate.updateOne(findTask);
+        ITodo updatedTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findTask.getId()});
+        System.out.println("updated -> " + updatedTask.getId());
     }
 
     public static void createEntityProxies() {

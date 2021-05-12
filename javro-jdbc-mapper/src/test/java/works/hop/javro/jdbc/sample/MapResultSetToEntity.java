@@ -1,7 +1,7 @@
 package works.hop.javro.jdbc.sample;
 
 import works.hop.javro.jdbc.EntityInfo;
-import works.hop.javro.jdbc.sample.account.ResultSetMultipleRows;
+import works.hop.javro.jdbc.sample.template.SelectTemplate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,14 +28,18 @@ public class MapResultSetToEntity {
                 } else {
                     if (hasJoinTable) {
                         System.out.println("non-collection relation with join column - Not yet handled");
-                    }
-                    else {
+                    } else {
                         Class<?> relationalType = field.type;
-                        MapResultSetToEntity mapper = new MapResultSetToEntity();
-                        //line below should make use of a service to fetch new result set
-                        ResultSet relationalResultSet = ResultSetMultipleRows.membersResultSet();
-                        Object relationalValue = mapper.mapRsToEntity(relationalResultSet, relationalType);
-                        source.put(field.name, relationalValue);
+                        EntityInfo joinEntityInfo = EntityMetadata.getEntityInfo.apply(relationalType);
+                        Class<?> joinType = joinEntityInfo.getFields().stream()
+                                .filter(f -> f.isId)
+                                .map(f -> f.type)
+                                .findFirst().orElse(null);
+                        if(joinType != null) {
+                            Object joinValue = rs.getObject(field.columnName, joinType);
+                            Object relationalValue = SelectTemplate.selectOne(relationalType, new Object[]{joinValue});
+                            source.put(field.name, relationalValue);
+                        }
                     }
                 }
             } else {
@@ -56,7 +60,7 @@ public class MapResultSetToEntity {
 
     public <T> Collection<T> mapRsToEntityCollection(ResultSet rs, Class<T> type) throws SQLException {
         Collection<T> collection = new LinkedList<>();
-        EntityInfo entityInfo= EntityMetadata.getEntityInfo.apply(type);
+        EntityInfo entityInfo = EntityMetadata.getEntityInfo.apply(type);
         while (rs.next()) {
             collection.add(mapRsToEntityRow(rs, type, entityInfo.getFields()));
         }
