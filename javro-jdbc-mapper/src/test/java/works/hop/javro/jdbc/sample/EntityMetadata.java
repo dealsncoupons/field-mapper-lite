@@ -1,6 +1,5 @@
 package works.hop.javro.jdbc.sample;
 
-import works.hop.javro.jdbc.EntityInfo;
 import works.hop.javro.jdbc.sample.account.IAccount;
 import works.hop.javro.jdbc.sample.account.IAddress;
 import works.hop.javro.jdbc.sample.account.IMember;

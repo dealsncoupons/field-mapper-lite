@@ -2,7 +2,7 @@ package works.hop.javro.jdbc.sample.template;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import works.hop.javro.jdbc.EntityInfo;
+import works.hop.javro.jdbc.sample.EntityInfo;
 import works.hop.javro.jdbc.sample.Unreflect;
 import works.hop.javro.jdbc.sample.EntityMetadata;
 import works.hop.javro.jdbc.sample.EntitySourceFactory;

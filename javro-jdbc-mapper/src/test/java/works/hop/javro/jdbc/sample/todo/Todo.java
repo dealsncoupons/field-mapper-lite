@@ -77,4 +77,45 @@ public class Todo implements ITodo {
     public void setSubTasks(ArrayList<ITodo> subTasks) {
         this.subTasks = subTasks;
     }
+
+    @Override
+    public <O> O get(String property) {
+        switch (property) {
+            case "id":
+                return (O) ref().getId();
+            case "name":
+                return (O) ref().getName();
+            case "completed":
+                return (O) ref().getCompleted();
+            case "nextTask":
+                return (O) ref().getNextTask();
+            case "subTasks":
+                return (O) ref().getSubTasks();
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public <O> void set(String property, O value) {
+        switch (property) {
+            case "id":
+                ref().setId((UUID) value);
+            case "name":
+                ref().setName((String) value);
+            case "completed":
+                ref().setCompleted((Boolean) value);
+            case "nextTask":
+                ref().setNextTask((ITodo) value);
+            case "subTasks":
+                ref().setSubTasks((ArrayList<ITodo>) value);
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public ITodo ref() {
+        return this;
+    }
 }

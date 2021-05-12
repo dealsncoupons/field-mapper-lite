@@ -1,6 +1,4 @@
-package works.hop.javro.jdbc;
-
-import works.hop.javro.jdbc.sample.FieldInfo;
+package works.hop.javro.jdbc.sample;
 
 import java.util.List;
 

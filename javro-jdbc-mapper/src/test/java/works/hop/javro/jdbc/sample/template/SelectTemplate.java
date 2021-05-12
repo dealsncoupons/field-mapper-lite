@@ -1,8 +1,9 @@
 package works.hop.javro.jdbc.sample.template;
 
+import io.vavr.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import works.hop.javro.jdbc.EntityInfo;
+import works.hop.javro.jdbc.sample.EntityInfo;
 import works.hop.javro.jdbc.sample.EntityMetadata;
 import works.hop.javro.jdbc.sample.FieldInfo;
 import works.hop.javro.jdbc.sample.MapResultSetToEntity;
@@ -15,34 +16,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static works.hop.javro.jdbc.sample.template.StaticQueries.SELECT_LIST_BY_JOIN__COLUMN;
+import static works.hop.javro.jdbc.sample.template.StaticQueries.SELECT_ONE_BY_ID;
+
 public class SelectTemplate {
 
     static final Logger log = LoggerFactory.getLogger(InsertTemplate.class);
-
-    private static String prepareQuery(EntityInfo entityInfo) {
-        List<String> fields = allColumns(entityInfo.getFields());
-        List<String> idFields = idColumns(entityInfo.getFields());
-        StringBuilder builder = new StringBuilder();
-        builder.append("select ");
-        int fieldIndex = 0;
-        for (String columnName : fields) {
-            builder.append(columnName);
-            fieldIndex++;
-            if (fieldIndex < fields.size()) {
-                builder.append(", ");
-            }
-        }
-        builder.append(" from ").append(entityInfo.getTableName()).append(" where ");
-        int idColumnIndex = 0;
-        for (String idColumn : idFields) {
-            builder.append(idColumn).append(" = ?::uuid");
-            idColumnIndex += 1;
-            if (idColumnIndex < idFields.size()) {
-                builder.append(" and ");
-            }
-        }
-        return builder.toString();
-    }
 
     private static List<String> allColumns(List<FieldInfo> entityInfo) {
         return entityInfo.stream()
@@ -58,7 +37,7 @@ public class SelectTemplate {
 
     public static <E> E selectOne(Class<E> type, Object[] args) {
         EntityInfo entityInfo = EntityMetadata.getEntityInfo.apply(type);
-        String query = prepareQuery(entityInfo);
+        String query = SELECT_ONE_BY_ID.apply(entityInfo);
         try (Connection conn = ConnectionProvider.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 for (int i = 0; i < args.length; i++) {
@@ -76,9 +55,9 @@ public class SelectTemplate {
         }
     }
 
-    public static <E> Collection<E> selectList(Class<E> type, Object[] args) {
-        EntityInfo entityInfo = EntityMetadata.getEntityInfo.apply(type);
-        String query = prepareQuery(entityInfo);
+    public static <E> Collection<E> selectList(EntityInfo entityInfo, Class<E> type, Object[] args) {
+        EntityInfo joinEntityInfo = EntityMetadata.getEntityInfo.apply(type);
+        String query = SELECT_LIST_BY_JOIN__COLUMN.apply(new Tuple3<>(entityInfo, joinEntityInfo, joinEntityInfo.getTableName()));
         try (Connection conn = ConnectionProvider.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
                 for (int i = 0; i < args.length; i++) {
