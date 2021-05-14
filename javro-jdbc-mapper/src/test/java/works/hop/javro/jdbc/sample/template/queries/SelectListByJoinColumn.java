@@ -18,12 +18,12 @@ public interface SelectListByJoinColumn {
     static Function<Tuple3<EntityInfo, EntityInfo, String>, String> get() {
         return (tuple) -> {
             EntityInfo leftTableInfo = tuple._1;
+            FieldInfo leftTablePk = leftTableInfo.getFields().stream().filter(
+                    field -> field.isId
+            ).findFirst().orElseThrow(() -> new RuntimeException("There's no 'id' field defined"));
             EntityInfo rightTableInfo = tuple._2;
-            String joinTable = tuple._3;
-            FieldInfo joinField = rightTableInfo.getFields().stream().filter(
-                    field -> field.columnName.equals("")
-            ).findFirst().get();
-            String pkColumn = "id";
+            String rightTableFk = tuple._3;
+
             List<String> fields = allNonIdColumns(leftTableInfo.getFields());
             List<String> idFields = idColumns(leftTableInfo.getFields());
             StringBuilder builder = new StringBuilder();
@@ -36,13 +36,13 @@ public interface SelectListByJoinColumn {
                     builder.append(", ");
                 }
             }
-            builder.append(" from ").append(leftTableInfo.getTableName()).append(" l ");
-            builder.append(" inner join ").append(joinTable).append(" r");
-            builder.append(" on r.").append(joinField.columnName).append(" = l.");
-            builder.append(pkColumn).append(" where ");
+            builder.append(" from ").append(leftTableInfo.getTableName()).append(" l");
+            builder.append(" inner join ").append(rightTableInfo.getTableName()).append(" r");
+            builder.append(" on r.").append(rightTableFk).append(" = l.");
+            builder.append(leftTablePk.columnName).append(" where ");
             int idColumnIndex = 0;
             for (String idColumn : idFields) {
-                builder.append("r.").append(idColumn).append(" = ?::uuid");
+                builder.append("l.").append(idColumn).append(" = ?::uuid");
                 idColumnIndex += 1;
                 if (idColumnIndex < idFields.size()) {
                     builder.append(" and ");

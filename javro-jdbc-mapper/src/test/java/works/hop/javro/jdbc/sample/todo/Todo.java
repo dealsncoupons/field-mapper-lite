@@ -101,14 +101,19 @@ public class Todo implements ITodo {
         switch (property) {
             case "id":
                 ref().setId((UUID) value);
+                break;
             case "name":
                 ref().setName((String) value);
+                break;
             case "completed":
                 ref().setCompleted((Boolean) value);
+                break;
             case "nextTask":
                 ref().setNextTask((ITodo) value);
+                break;
             case "subTasks":
                 ref().setSubTasks((ArrayList<ITodo>) value);
+                break;
             default:
                 break;
         }

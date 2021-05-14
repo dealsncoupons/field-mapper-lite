@@ -6,10 +6,7 @@ import works.hop.javro.jdbc.sample.template.InsertTemplate;
 import works.hop.javro.jdbc.sample.template.SelectTemplate;
 import works.hop.javro.jdbc.sample.template.UpdateTemplate;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TodosApp {
 
@@ -44,17 +41,18 @@ public class TodosApp {
         System.out.println("saved -> " + saved.getId());
 
         //select task just created
-        ITodo findTask = SelectTemplate.selectOne(ITodo.class, new Object[]{saved.getId()});
+        UUID findId = UUID.fromString("94063546-b37b-11eb-b91b-0242ac110002"); //saved.getId()
+        ITodo findTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findId});
         System.out.println("selected -> " + findTask.getId());
 
         //modify found task
-        findTask.setNextTask(task11);
-        findTask.getSubTasks().remove(0);
+//        findTask.setNextTask(task11);
+//        findTask.getSubTasks().remove(0);
 
         //updated modified task
-        UpdateTemplate.updateOne(findTask);
-        ITodo updatedTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findTask.getId()});
-        System.out.println("updated -> " + updatedTask.getId());
+//        UpdateTemplate.updateOne(findTask);
+//        ITodo updatedTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findTask.getId()});
+//        System.out.println("updated -> " + updatedTask.getId());
     }
 
     public static void createEntityProxies() {

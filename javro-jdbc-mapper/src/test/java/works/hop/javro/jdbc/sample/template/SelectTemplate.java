@@ -55,7 +55,7 @@ public class SelectTemplate {
         }
     }
 
-    public static <E> Collection<E> selectList(EntityInfo entityInfo, Class<E> type, Object[] args) {
+    public static <E> Collection<E> selectListByJoinColumn(EntityInfo entityInfo, Class<E> type, Object[] args) {
         EntityInfo joinEntityInfo = EntityMetadata.getEntityInfo.apply(type);
         String query = SELECT_LIST_BY_JOIN__COLUMN.apply(new Tuple3<>(entityInfo, joinEntityInfo, joinEntityInfo.getTableName()));
         try (Connection conn = ConnectionProvider.getConnection()) {

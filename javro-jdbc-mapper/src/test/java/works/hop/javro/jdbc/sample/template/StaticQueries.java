@@ -33,4 +33,16 @@ public interface StaticQueries {
                 .filter(field -> !field.isCollection)
                 .map(field -> field.columnName).collect(Collectors.toList());
     }
+
+    static List<FieldInfo> allFieldsExceptId(List<FieldInfo> entityInfo) {
+        return entityInfo.stream()
+                .filter(field -> !field.isId)
+                .collect(Collectors.toList());
+    }
+
+    static List<String> allColumnsExceptId(List<FieldInfo> entityInfo) {
+        return entityInfo.stream()
+                .filter(field -> !field.isId)
+                .map(field -> field.columnName).collect(Collectors.toList());
+    }
 }

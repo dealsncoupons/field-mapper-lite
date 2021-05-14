@@ -23,15 +23,9 @@ public class MapResultSetToEntity {
                         System.out.println("collection relation with join column - Not yet handled");
                     } else {
                         Class<?> relationalType = field.type;
-                        EntityInfo joinEntityInfo = EntityMetadata.getEntityInfo.apply(relationalType);
-                        FieldInfo joinField = joinEntityInfo.getFields().stream()
-                                .filter(f -> f.isId)
-                                .findFirst().orElse(null);
-                        if(joinField != null) {
-                            Object joinValue = rs.getObject(joinField.columnName, joinField.type);
-                            Object relationalValue = SelectTemplate.selectList(entityInfo, relationalType, new Object[]{joinValue});
-                            source.put(field.name, relationalValue);
-                        }
+                        Object joinValue = rs.getObject(field.columnName, relationalType);
+                        Object relationalValue = SelectTemplate.selectListByJoinColumn(entityInfo, relationalType, new Object[]{joinValue});
+                        source.put(field.name, relationalValue);
                     }
                 } else {
                     if (hasJoinTable) {
@@ -43,7 +37,7 @@ public class MapResultSetToEntity {
                                 .filter(f -> f.isId)
                                 .map(f -> f.type)
                                 .findFirst().orElse(null);
-                        if(joinType != null) {
+                        if (joinType != null) {
                             Object joinValue = rs.getObject(field.columnName, joinType);
                             Object relationalValue = SelectTemplate.selectOne(relationalType, new Object[]{joinValue});
                             source.put(field.name, relationalValue);
