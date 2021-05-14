@@ -17,7 +17,6 @@ public interface StaticQueries {
 
     static List<String> allColumns(List<FieldInfo> entityInfo) {
         return entityInfo.stream()
-                .filter(field -> !field.isCollection)
                 .map(field -> field.columnName).collect(Collectors.toList());
     }
 
@@ -30,7 +29,6 @@ public interface StaticQueries {
     static List<String> allNonIdColumns(List<FieldInfo> entityInfo) {
         return entityInfo.stream()
                 .filter(field -> field.isId)
-                .filter(field -> !field.isCollection)
                 .map(field -> field.columnName).collect(Collectors.toList());
     }
 

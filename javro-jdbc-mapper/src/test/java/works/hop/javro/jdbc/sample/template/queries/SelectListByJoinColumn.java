@@ -24,7 +24,7 @@ public interface SelectListByJoinColumn {
             EntityInfo rightTableInfo = tuple._2;
             String rightTableFk = tuple._3;
 
-            List<String> fields = allNonIdColumns(leftTableInfo.getFields());
+            List<String> fields = allColumns(leftTableInfo.getFields());
             List<String> idFields = idColumns(leftTableInfo.getFields());
             StringBuilder builder = new StringBuilder();
             builder.append("select ");

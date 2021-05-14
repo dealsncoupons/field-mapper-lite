@@ -19,29 +19,29 @@ public class TodosApp {
     }
 
     public static void createEntitySources() {
-        Todo task1 = new Todo("make breakfast", false);
-        Todo task11 = new Todo("pour milk", false);
-        Todo task12 = new Todo("make pancake", false);
-        Todo task121 = new Todo("heat up skillet", false);
-        Todo task122 = new Todo("pour prepared mix", false);
-        Todo task123 = new Todo("cook to golden brown", false);
-        Todo task13 = new Todo("serve when ready", false);
-
-        task1.getSubTasks().add(task11);
-        task1.getSubTasks().add(task12);
-        task1.getSubTasks().add(task13);
-
-        task12.getSubTasks().add(task121);
-        task12.getSubTasks().add(task122);
-        task12.getSubTasks().add(task123);
-
-        ITodo theTask = EntitySourceFactory.create(task1);
-        printTasks("", List.of(theTask));
-        ITodo saved = InsertTemplate.insertOne(task1);
-        System.out.println("saved -> " + saved.getId());
+//        Todo task1 = new Todo("make breakfast", false);
+//        Todo task11 = new Todo("pour milk", false);
+//        Todo task12 = new Todo("make pancake", false);
+//        Todo task121 = new Todo("heat up skillet", false);
+//        Todo task122 = new Todo("pour prepared mix", false);
+//        Todo task123 = new Todo("cook to golden brown", false);
+//        Todo task13 = new Todo("serve when ready", false);
+//
+//        task1.getSubTasks().add(task11);
+//        task1.getSubTasks().add(task12);
+//        task1.getSubTasks().add(task13);
+//
+//        task12.getSubTasks().add(task121);
+//        task12.getSubTasks().add(task122);
+//        task12.getSubTasks().add(task123);
+//
+//        ITodo theTask = EntitySourceFactory.create(task1);
+//        printTasks("", List.of(theTask));
+//        ITodo saved = InsertTemplate.insertOne(task1);
+//        System.out.println("saved -> " + saved.getId());
 
         //select task just created
-        UUID findId = UUID.fromString("94063546-b37b-11eb-b91b-0242ac110002"); //saved.getId()
+        UUID findId = UUID.fromString("117db1d0-b4ca-11eb-a81c-0a0027000015"); //saved.getId()
         ITodo findTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findId});
         System.out.println("selected -> " + findTask.getId());
 
@@ -50,9 +50,9 @@ public class TodosApp {
 //        findTask.getSubTasks().remove(0);
 
         //updated modified task
-//        UpdateTemplate.updateOne(findTask);
-//        ITodo updatedTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findTask.getId()});
-//        System.out.println("updated -> " + updatedTask.getId());
+        UpdateTemplate.updateOne(findTask);
+        ITodo updatedTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findTask.getId()});
+        System.out.println("updated -> " + updatedTask.getId());
     }
 
     public static void createEntityProxies() {
