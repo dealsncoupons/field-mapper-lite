@@ -6,15 +6,15 @@ import java.util.List;
 public class Vertex01<T> {
 
     private final T name;
+    private final List<Edge<T>> neighbours;
     private int minDistance;
     private boolean visited;
     private Vertex01<T> predecessor;
-    private final List<Edge<T>> neighbours;
 
     public Vertex01(T name) {
         this.name = name;
         this.minDistance = Integer.MAX_VALUE;
-        this.neighbours  = new LinkedList<>();
+        this.neighbours = new LinkedList<>();
     }
 
     public T getName() {

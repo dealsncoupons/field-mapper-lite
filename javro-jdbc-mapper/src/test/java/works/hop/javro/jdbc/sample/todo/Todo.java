@@ -3,6 +3,7 @@ package works.hop.javro.jdbc.sample.todo;
 import works.hop.javro.jdbc.annotation.Table;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Table("tbl_task")
@@ -12,7 +13,8 @@ public class Todo implements ITodo {
     String name;
     Boolean completed;
     ITodo nextTask;
-    ArrayList<ITodo> subTasks = new ArrayList<>();
+    ITodo parentTask;
+    List<ITodo> subTasks = new ArrayList<>();
 
     public Todo() {
         this(null, null, null);
@@ -69,12 +71,22 @@ public class Todo implements ITodo {
     }
 
     @Override
-    public ArrayList<ITodo> getSubTasks() {
+    public ITodo getParentTask() {
+        return parentTask;
+    }
+
+    @Override
+    public void setParentTask(ITodo parentTask) {
+        this.parentTask = parentTask;
+    }
+
+    @Override
+    public List<ITodo> getSubTasks() {
         return this.subTasks;
     }
 
     @Override
-    public void setSubTasks(ArrayList<ITodo> subTasks) {
+    public void setSubTasks(List<ITodo> subTasks) {
         this.subTasks = subTasks;
     }
 
@@ -82,15 +94,17 @@ public class Todo implements ITodo {
     public <O> O get(String property) {
         switch (property) {
             case "id":
-                return (O) ref().getId();
+                return (O) source().getId();
             case "name":
-                return (O) ref().getName();
+                return (O) source().getName();
             case "completed":
-                return (O) ref().getCompleted();
+                return (O) source().getCompleted();
             case "nextTask":
-                return (O) ref().getNextTask();
+                return (O) source().getNextTask();
+            case "parentTask":
+                return (O) source().getParentTask();
             case "subTasks":
-                return (O) ref().getSubTasks();
+                return (O) source().getSubTasks();
             default:
                 return null;
         }
@@ -100,19 +114,22 @@ public class Todo implements ITodo {
     public <O> void set(String property, O value) {
         switch (property) {
             case "id":
-                ref().setId((UUID) value);
+                source().setId((UUID) value);
                 break;
             case "name":
-                ref().setName((String) value);
+                source().setName((String) value);
                 break;
             case "completed":
-                ref().setCompleted((Boolean) value);
+                source().setCompleted((Boolean) value);
                 break;
             case "nextTask":
-                ref().setNextTask((ITodo) value);
+                source().setNextTask((ITodo) value);
+                break;
+            case "parentTask":
+                source().setParentTask((ITodo) value);
                 break;
             case "subTasks":
-                ref().setSubTasks((ArrayList<ITodo>) value);
+                source().setSubTasks((List<ITodo>) value);
                 break;
             default:
                 break;
@@ -120,7 +137,7 @@ public class Todo implements ITodo {
     }
 
     @Override
-    public ITodo ref() {
+    public ITodo source() {
         return this;
     }
 }

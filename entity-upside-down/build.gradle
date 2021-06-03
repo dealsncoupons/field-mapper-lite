@@ -1,0 +1,68 @@
+plugins {
+    id 'java'
+}
+
+group 'works.hop'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url("https://packages.confluent.io/maven/") }
+}
+
+dependencies {
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
+
+    implementation group: 'io.debezium', name: 'debezium-api', version: '1.5.2.Final'
+    implementation group: 'io.debezium', name: 'debezium-embedded', version: '1.5.2.Final'
+    implementation group: 'io.debezium', name: 'debezium-connector-postgres', version: '1.5.2.Final'
+
+    implementation group: 'org.apache.avro', name: 'avro', version: '1.10.2'
+//    compileOnly group: 'org.apache.avro', name: 'avro-tools', version: '1.10.2'
+    implementation group: 'io.confluent', name: 'kafka-connect-avro-converter', version: '6.1.0'
+
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.4.5'
+    runtimeOnly 'org.postgresql:postgresql:42.2.19'
+
+    compileOnly 'org.projectlombok:lombok:1.18.20'
+
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.7.1'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+//task generateSources {
+//    doFirst {
+//        FileCollection collection
+//        collection = layout.files {
+//            file('src/main/resources/avro').listFiles(new FilenameFilter() {
+//                @Override
+//                boolean accept(File dir, String name) {
+//                    return name.endsWith("avsc")
+//                }
+//            })
+//        }
+//
+//        collection.collect { relativePath(it) }.sort().each {
+//            String source = it
+//            println "processing avro source file $source"
+//            String output
+//            output = "${projectDir}/build/generated/classes"
+//            exec {
+//                group = "Execution"
+//                description = "Run the main class with ExecTask"
+//                commandLine "java", "-jar", "${projectDir}/lib/avro-tools-1.10.2.jar", "compile", "schema", "$source", "$output"
+//            }
+//        }
+//    }
+//}
+//
+//compileJava.dependsOn generateSources
+//
+//sourceSets.main.java.srcDirs += "${projectDir}/build/generated/classes"

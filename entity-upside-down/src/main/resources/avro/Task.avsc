@@ -1,0 +1,47 @@
+{
+  "namespace": "works.hop.upside.changes.data",
+  "name": "TaskTO",
+  "type": "record",
+  "doc": "Task table row change event",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "done",
+      "aliases": [
+        "completed"
+      ],
+      "type": "boolean"
+    },
+    {
+      "name": "next_task",
+      "aliases": [
+        "nextTask"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "parent_task",
+      "aliases": [
+        "dependsOn"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "date_created",
+      "aliases": [
+        "dateCreated"
+      ],
+      "type": {
+        "type": "long",
+        "logicalType": "local-timestamp-millis"
+      }
+    }
+  ]
+}

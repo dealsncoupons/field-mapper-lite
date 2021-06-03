@@ -1,10 +1,12 @@
 package works.hop.javro.jdbc.sample.account;
 
+import works.hop.javro.jdbc.sample.Unreflect;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public interface IMember {
+public interface IMember extends Unreflect {
     UUID getId();
 
     void setId(UUID id);

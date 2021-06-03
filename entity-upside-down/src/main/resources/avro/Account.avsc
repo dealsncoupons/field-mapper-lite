@@ -1,0 +1,43 @@
+{
+  "namespace": "works.hop.upside.changes.data",
+  "name": "AccountTO",
+  "type": "record",
+  "doc": "Account table row change event",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "user_name",
+      "aliases": [
+        "username"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "access_code",
+      "aliases": [
+        "password"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "user_id",
+      "aliases": [
+        "user"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "date_created",
+      "aliases": [
+        "dateCreated"
+      ],
+      "type": {
+        "type": "long",
+        "logicalType": "local-timestamp-millis"
+      }
+    }
+  ]
+}

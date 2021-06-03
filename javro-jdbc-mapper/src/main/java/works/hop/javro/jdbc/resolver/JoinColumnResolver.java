@@ -3,7 +3,7 @@ package works.hop.javro.jdbc.resolver;
 import works.hop.javro.jdbc.annotation.JoinColumn;
 import works.hop.javro.jdbc.annotation.Table;
 import works.hop.javro.jdbc.reflect.ReflectionUtil;
-import works.hop.javro.jdbc.template.SelectTemplate;
+import works.hop.javro.jdbc.template.toremove.SelectTemplate;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

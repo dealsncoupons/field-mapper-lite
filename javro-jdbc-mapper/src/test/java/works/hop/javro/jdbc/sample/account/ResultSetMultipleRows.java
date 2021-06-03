@@ -1,11 +1,11 @@
 package works.hop.javro.jdbc.sample.account;
 
 import org.junit.Test;
+import works.hop.javro.jdbc.sample.EntityInfo;
+import works.hop.javro.jdbc.sample.EntityMetadata;
 import works.hop.javro.jdbc.sample.MapResultSetToEntity;
-import works.hop.javro.jdbc.sample.account.IAccount;
-import works.hop.javro.jdbc.sample.account.IMember;
-import works.hop.javro.jdbc.sample.account.MockAccounts;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -96,17 +96,20 @@ public class ResultSetMultipleRows {
 
     @Test
     public void testMapAccountFromResultSetToEntity() throws SQLException {
-        MapResultSetToEntity mapper = new MapResultSetToEntity();
-        IAccount entity = mapper.mapRsToEntity(accountsResultSet(), IAccount.class);
+        MapResultSetToEntity mapper = new MapResultSetToEntity(Collections.emptyMap());
+        Connection conn = mock(Connection.class);
+        IAccount entity = mapper.mapRsToEntity(accountsResultSet(), IAccount.class, conn);
         System.out.println("IAccount id from resultset -> " + entity.getId());
     }
 
     @Test
     public void testMapAccountFromResultSetToEntityCollection() throws SQLException {
-        MapResultSetToEntity mapper = new MapResultSetToEntity();
-        Collection<IAccount> entities = mapper.mapRsToEntityCollection(accountsResultSet(), IAccount.class);
+        MapResultSetToEntity mapper = new MapResultSetToEntity(Collections.emptyMap());
+        Connection conn = mock(Connection.class);
+        EntityInfo entityInfo = EntityMetadata.entityInfoByType.apply(IAccount.class);
+        Collection<IAccount> entities = mapper.mapRsToEntityCollection(accountsResultSet(), IAccount.class, entityInfo, conn);
         System.out.println("IAccount collection size -> " + entities.size());
-        for(IAccount entity : entities){
+        for (IAccount entity : entities) {
             System.out.println("IAccount id from resultset -> " + entity.getId());
             System.out.println("IAccount's username -> " + entity.getUsername());
             System.out.println("IAccount's member full name -> " + entity.getMember().getFullName());
@@ -115,18 +118,21 @@ public class ResultSetMultipleRows {
 
     @Test
     public void testMapMemberFromResultSetToEntity() throws SQLException {
-        MapResultSetToEntity mapper = new MapResultSetToEntity();
-        IMember entity = mapper.mapRsToEntity(membersResultSet(), IMember.class);
+        MapResultSetToEntity mapper = new MapResultSetToEntity(Collections.emptyMap());
+        Connection conn = mock(Connection.class);
+        IMember entity = mapper.mapRsToEntity(membersResultSet(), IMember.class, conn);
         System.out.println("IMember id from resultset -> " + entity.getId());
         System.out.println("IMember's city -> " + entity.getAddress().getCity());
     }
 
     @Test
     public void testMapMemberFromResultSetToEntityCollection() throws SQLException {
-        MapResultSetToEntity mapper = new MapResultSetToEntity();
-        Collection<IMember> entities = mapper.mapRsToEntityCollection(membersResultSet(), IMember.class);
+        MapResultSetToEntity mapper = new MapResultSetToEntity(Collections.emptyMap());
+        EntityInfo entityInfo = EntityMetadata.entityInfoByType.apply(IMember.class);
+        Connection conn = mock(Connection.class);
+        Collection<IMember> entities = mapper.mapRsToEntityCollection(membersResultSet(), IMember.class, entityInfo, conn);
         System.out.println("IMember collection size -> " + entities.size());
-        for(IMember entity : entities){
+        for (IMember entity : entities) {
             System.out.println("IMember id from resultset -> " + entity.getId());
             System.out.println("IMember's city -> " + entity.getAddress().getCity());
         }

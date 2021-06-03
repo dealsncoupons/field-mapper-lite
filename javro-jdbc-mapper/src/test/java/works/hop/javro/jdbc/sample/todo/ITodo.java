@@ -2,7 +2,7 @@ package works.hop.javro.jdbc.sample.todo;
 
 import works.hop.javro.jdbc.sample.Unreflect;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public interface ITodo extends Unreflect {
@@ -23,7 +23,11 @@ public interface ITodo extends Unreflect {
 
     void setNextTask(ITodo nextTask);
 
-    ArrayList<ITodo> getSubTasks();
+    ITodo getParentTask();
 
-    void setSubTasks(ArrayList<ITodo> subTasks);
+    void setParentTask(ITodo parentTask);
+
+    List<ITodo> getSubTasks();
+
+    void setSubTasks(List<ITodo> subTasks);
 }

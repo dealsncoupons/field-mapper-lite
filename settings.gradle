@@ -10,4 +10,5 @@ include 'javro-entity-mapper'
 include 'javro-gen-plugin'
 include 'javro-jdbc-mapper'
 include 'javro-sample-app'
+include 'entity-upside-down'
 

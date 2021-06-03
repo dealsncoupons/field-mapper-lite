@@ -1,0 +1,36 @@
+{
+  "namespace": "works.hop.upside.changes.data",
+  "name": "AssignmentTO",
+  "type": "record",
+  "doc": "Assignee table row change event",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "task_id",
+      "aliases": [
+        "task"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "assignee_id",
+      "aliases": [
+        "assignee"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "date_created",
+      "aliases": [
+        "dateCreated"
+      ],
+      "type": {
+        "type": "long",
+        "logicalType": "local-timestamp-millis"
+      }
+    }
+  ]
+}

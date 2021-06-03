@@ -1,0 +1,64 @@
+{
+  "namespace": "works.hop.upside.changes.data",
+  "name": "UserTO",
+  "type": "record",
+  "doc": "User table row change event",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string"
+    },
+    {
+      "name": "first_name",
+      "aliases": [
+        "firstName"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "last_name",
+      "aliases": [
+        "lastName"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "email_address",
+      "aliases": [
+        "password"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "addr_city",
+      "aliases": [
+        "city"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "addr_state_prov",
+      "aliases": [
+        "state"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "addr_zip_code",
+      "aliases": [
+        "zipCode"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "date_created",
+      "aliases": [
+        "dateCreated"
+      ],
+      "type": {
+        "type": "long",
+        "logicalType": "local-timestamp-millis"
+      }
+    }
+  ]
+}

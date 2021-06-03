@@ -39,7 +39,7 @@ public class CycleDetection {
                 System.out.println("Backward edge ... there's a cycle");
                 return;
             }
-            if(!v.isVisited()){
+            if (!v.isVisited()) {
                 v.setVisited(true);
                 dfs(v);
             }
