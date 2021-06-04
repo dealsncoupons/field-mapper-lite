@@ -9,7 +9,7 @@ public class DeleteTemplate {
 
     private static final Logger log = LoggerFactory.getLogger(DeleteTemplate.class);
 
-    public static <E extends Hydrant> E deleteOne(E entity) {
+    public static <E extends Hydrate> E deleteOne(E entity) {
         Connection connection = null;
         try {
             connection = ConnectionProvider.getConnection();
@@ -39,7 +39,7 @@ public class DeleteTemplate {
         }
     }
 
-    public static <E extends Hydrant> E deleteOne(E entity, Connection connection) {
+    public static <E extends Hydrate> E deleteOne(E entity, Connection connection) {
         try {
             return entity.delete(connection);
         } catch (Exception e) {

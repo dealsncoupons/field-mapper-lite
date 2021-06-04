@@ -13,6 +13,8 @@ public class FieldInfoBuilder {
     public Boolean isEmbedded = Boolean.FALSE;
     public Boolean isRelational = Boolean.FALSE;
     public Boolean isCollection = Boolean.FALSE;
+    public Boolean isUpdatable = Boolean.TRUE;
+    public Boolean isTemporal = Boolean.FALSE;
     public String joinTable;
     public List<FieldInfo> embeddedFields = new ArrayList<>();
 
@@ -58,6 +60,16 @@ public class FieldInfoBuilder {
         return this;
     }
 
+    public FieldInfoBuilder updatable(Boolean updatable) {
+        isUpdatable = updatable;
+        return this;
+    }
+
+    public FieldInfoBuilder temporal(Boolean temporal) {
+        isTemporal = temporal;
+        return this;
+    }
+
     public FieldInfoBuilder joinTable(String joinTable) {
         this.joinTable = joinTable;
         return this;
@@ -79,7 +91,8 @@ public class FieldInfoBuilder {
                 this.isEmbedded,
                 this.isRelational,
                 this.isCollection,
-                this.joinTable,
-                this.embeddedFields);
+                this.isUpdatable,
+                this.isTemporal,
+                this.joinTable, this.embeddedFields);
     }
 }

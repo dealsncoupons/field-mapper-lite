@@ -9,7 +9,7 @@ public class InsertTemplate {
 
     static final Logger log = LoggerFactory.getLogger(InsertTemplate.class);
 
-    public static <E extends Hydrant> E insertOne(E entity) {
+    public static <E extends Hydrate> E insertOne(E entity) {
         Connection connection = null;
         try {
             connection = ConnectionProvider.getConnection();
@@ -39,7 +39,7 @@ public class InsertTemplate {
         }
     }
 
-    public static <E extends Hydrant> E insertOne(E entity, Connection connection) {
+    public static <E extends Hydrate> E insertOne(E entity, Connection connection) {
         try {
             return entity.insert(connection);
         } catch (Exception e) {

@@ -1,36 +1,41 @@
 {
-  "namespace": "works.hop.upside.changes.data",
-  "name": "AssignmentTO",
   "type": "record",
-  "doc": "Assignee table row change event",
+  "namespace": "works.hop.upside.entity",
+  "name": "Assignment",
+  "annotations": [
+    "works.hop.javro.jdbc.annotation.Table(\"tbl_assignment\")"
+  ],
+  "doc": "Task assignment details",
   "fields": [
     {
+      "type": "java.util.UUID",
       "name": "id",
-      "type": "string"
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Id"
+      ],
+      "doc": "The primary key identifier for the assignment"
     },
     {
-      "name": "task_id",
-      "aliases": [
-        "task"
+      "name": "task",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.JoinColumn(\"task_id\")"
       ],
-      "type": "string"
+      "type": "works.hop.upside.entity.Task"
     },
     {
-      "name": "assignee_id",
-      "aliases": [
-        "assignee"
+      "name": "assignee",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.JoinColumn(\"assignee_id\")"
       ],
-      "type": "string"
+      "type": "works.hop.upside.entity.User"
     },
     {
-      "name": "date_created",
-      "aliases": [
-        "dateCreated"
+      "name": "dateAssigned",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"date_assigned\")",
+        "works.hop.javro.jdbc.annotation.Temporal"
       ],
-      "type": {
-        "type": "long",
-        "logicalType": "local-timestamp-millis"
-      }
+      "type": "java.time.LocalDateTime"
     }
   ]
 }

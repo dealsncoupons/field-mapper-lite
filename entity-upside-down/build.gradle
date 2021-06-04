@@ -1,6 +1,20 @@
+buildscript {
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath group: "works.hop", name: "javro-gen-plugin", version: "1.0-SNAPSHOT"
+    }
+}
+
 plugins {
     id 'java'
 }
+
+//apply plugin: 'works.hop.javro-gen-plugin'
 
 group 'works.hop'
 version '1.0-SNAPSHOT'
@@ -8,20 +22,17 @@ version '1.0-SNAPSHOT'
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url("https://packages.confluent.io/maven/") }
 }
 
 dependencies {
+    compileOnly project(":entity-mapper-api")
+
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
 
     implementation group: 'io.debezium', name: 'debezium-api', version: '1.5.2.Final'
     implementation group: 'io.debezium', name: 'debezium-embedded', version: '1.5.2.Final'
     implementation group: 'io.debezium', name: 'debezium-connector-postgres', version: '1.5.2.Final'
-
-    implementation group: 'org.apache.avro', name: 'avro', version: '1.10.2'
-//    compileOnly group: 'org.apache.avro', name: 'avro-tools', version: '1.10.2'
-    implementation group: 'io.confluent', name: 'kafka-connect-avro-converter', version: '6.1.0'
 
     implementation group: 'com.zaxxer', name: 'HikariCP', version: '3.4.5'
     runtimeOnly 'org.postgresql:postgresql:42.2.19'
@@ -36,6 +47,13 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+//generateJavro({
+//    sourceDir = file("src/main/resources/avro")
+//    destDir = file("src/main/java")
+//})
+//
+//compileJava.dependsOn generateJavro
 
 //task generateSources {
 //    doFirst {

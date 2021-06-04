@@ -1,43 +1,48 @@
 {
-  "namespace": "works.hop.upside.changes.data",
-  "name": "AccountTO",
   "type": "record",
-  "doc": "Account table row change event",
+  "namespace": "works.hop.upside.entity",
+  "name": "Account",
+  "annotations": [
+    "works.hop.javro.jdbc.annotation.Table(\"tbl_account\")"
+  ],
+  "doc": "Account details",
   "fields": [
     {
+      "type": "java.util.UUID",
       "name": "id",
-      "type": "string"
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Id"
+      ],
+      "doc": "The primary key identifier for the account"
     },
     {
-      "name": "user_name",
-      "aliases": [
-        "username"
+      "name": "username",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"user_name\")"
       ],
       "type": "string"
     },
     {
-      "name": "access_code",
-      "aliases": [
-        "password"
+      "name": "password",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"access_code\")"
       ],
       "type": "string"
     },
     {
-      "name": "user_id",
-      "aliases": [
-        "user"
+      "name": "user",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.JoinColumn(value = \"user_id\", fkTable=\"tbl_user\")"
       ],
-      "type": "string"
+      "type": "works.hop.upside.entity.User"
     },
     {
-      "name": "date_created",
-      "aliases": [
-        "dateCreated"
+      "name": "dateCreated",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(value=\"date_created\", updatable=false)",
+        "works.hop.javro.jdbc.annotation.Temporal"
       ],
-      "type": {
-        "type": "long",
-        "logicalType": "local-timestamp-millis"
-      }
+      "type": "java.time.LocalDate"
     }
   ]
 }

@@ -1,8 +1,6 @@
 package works.hop.javro.gen.core;
 
 import works.hop.javro.gen.builder.*;
-import works.hop.javro.gen.metadata.MetadataGen;
-import works.hop.javro.gen.metadata.OnReadyListener;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -18,12 +16,10 @@ public class Parser {
     final List<Token> tokens = new ArrayList<>();
     final Stack<TypeBuilder<?>> builderStack = new Stack<>();
     final List<Node> readyList = new ArrayList<>();
-    final OnReadyListener onReadyListener;
     String namespace;
     int current = 0;
 
-    public Parser(List<Token> tokens, OnReadyListener onReadyListener) {
-        this.onReadyListener = onReadyListener;
+    public Parser(List<Token> tokens) {
         if (tokens.isEmpty()) {
             throw new RuntimeException("Parser cannot function without tokens");
         }
@@ -31,36 +27,35 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-        String defaultSrcDir = "javro-sample-app/src/main/resources/model";
-        String defaultDestDir = "javro-sample-app/src/main/java";
+        String defaultSrcDir = "entity-upside-down/src/main/resources/avro";
+//        String defaultDestDir = "entity-upside-down/build/generated-sources";
+        String defaultDestDir = "entity-upside-down/src/main/java";
         String srcDir = args != null && args.length > 0 ? args[0] : defaultSrcDir;
         String destDir = args != null && args.length > 0 ? args[0] : defaultDestDir;
-        MetadataGen metadataGen = new MetadataGen(Paths.get(destDir).toFile());
-        Parser.generateJavro(srcDir, destDir, metadataGen);
-        metadataGen.generate();
+        Parser.generateJavro(srcDir, destDir);
     }
 
-    public static void generateJavro(String srcDir, String destDir, OnReadyListener onReadyListener) {
-        generateJavroUsingDir(Paths.get(srcDir).toFile(), Paths.get(destDir).toFile(), onReadyListener);
+    public static void generateJavro(String srcDir, String destDir) {
+        generateJavroUsingDir(Paths.get(srcDir).toFile(), Paths.get(destDir).toFile());
     }
 
-    public static void generateJavroUsingDir(File srcDir, File destDir, OnReadyListener onReadyListener) {
+    public static void generateJavroUsingDir(File srcDir, File destDir) {
         File[] listOfFiles = srcDir.listFiles((dir, name) -> name.endsWith(".avsc"));
 
         if (listOfFiles != null) {
             for (File sourceFile : listOfFiles) {
-                generateJavroUsingFile(sourceFile, destDir, onReadyListener);
+                generateJavroUsingFile(sourceFile, destDir);
             }
         } else {
             System.err.println("Could not find files from specified directory - '" + srcDir + "'");
         }
     }
 
-    public static void generateJavroUsingFile(File sourceFile, File outputDir, OnReadyListener onReadyListener) {
+    public static void generateJavroUsingFile(File sourceFile, File outputDir) {
         Lexer gen = new Lexer(sourceFile);
         gen.parse();
 
-        Parser parser = new Parser(gen.getTokens(), onReadyListener);
+        Parser parser = new Parser(gen.getTokens());
         parser.parse();
 
         List<String> extraTypes = parser.getReadyList().stream().map(node ->
@@ -69,9 +64,6 @@ public class Parser {
             Generator generator = new Generator(node, extraTypes, outputDir);
             generator.generate();
         }
-
-        //notify listeners
-        parser.completed();
     }
 
     public List<Node> getReadyList() {
@@ -120,10 +112,6 @@ public class Parser {
                 node.packageName = namespace;
             }
         });
-    }
-
-    public void completed() {
-        this.onReadyListener.completed(this.getReadyList());
     }
 
     public void recordType() {

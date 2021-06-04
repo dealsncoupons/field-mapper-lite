@@ -4,8 +4,8 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TypesMap extends HashMap<String, TypeName> {
@@ -30,7 +30,7 @@ public class TypesMap extends HashMap<String, TypeName> {
     public TypeName createFieldType(Node fieldNode) {
         switch (fieldNode.type) {
             case TokenType.ARRAY:
-                ClassName list = ClassName.get(List.class);
+                ClassName list = ClassName.get(Collection.class);
                 return ParameterizedTypeName.get(list, typeName(fieldNode.items));
             case TokenType.MAP:
                 TypeName string = ClassName.get(String.class);

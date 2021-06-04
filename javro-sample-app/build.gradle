@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly project(":entity-mapper-api")
     compileOnly project(":javro-jdbc-mapper")
     compileOnly project(":javro-gen-plugin")
     compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'

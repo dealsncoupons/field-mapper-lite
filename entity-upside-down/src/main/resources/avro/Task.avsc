@@ -1,47 +1,68 @@
 {
-  "namespace": "works.hop.upside.changes.data",
-  "name": "TaskTO",
   "type": "record",
-  "doc": "Task table row change event",
+  "namespace": "works.hop.upside.entity",
+  "name": "Task",
+  "annotations": [
+    "works.hop.javro.jdbc.annotation.Table(\"tbl_task\")"
+  ],
+  "doc": "Task details",
   "fields": [
     {
+      "type": "java.util.UUID",
       "name": "id",
-      "type": "string"
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Id"
+      ],
+      "doc": "The primary key identifier for the task"
     },
     {
+      "type": "string",
       "name": "name",
-      "type": "string"
+      "doc": "The description of the task"
     },
     {
-      "name": "done",
-      "aliases": [
-        "completed"
+      "type": "boolean",
+      "name": "completed",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"done\")"
       ],
-      "type": "boolean"
+      "doc": "Indicates whether the task is completed"
     },
     {
-      "name": "next_task",
-      "aliases": [
-        "nextTask"
+      "type": "java.time.LocalDate",
+      "name": "dateCreated",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(value=\"date_created\", updatable=false)",
+        "works.hop.javro.jdbc.annotation.Temporal"
       ],
-      "type": "string"
+      "doc": "Date the task was created"
     },
     {
-      "name": "parent_task",
-      "aliases": [
-        "dependsOn"
+      "type": "works.hop.upside.entity.Task",
+      "name": "nextTask",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.JoinColumn(value = \"next_task\", fkTable = \"tbl_task\")"
       ],
-      "type": "string"
+      "doc": "The scheduled next task's id"
     },
     {
-      "name": "date_created",
-      "aliases": [
-        "dateCreated"
+      "type": "works.hop.upside.entity.Task",
+      "name": "dependsOn",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.JoinColumn(value = \"parent_task\", fkTable = \"tbl_task\")"
       ],
+      "doc": "This task's parent id"
+    },
+    {
       "type": {
-        "type": "long",
-        "logicalType": "local-timestamp-millis"
-      }
+        "type": "array",
+        "items": "works.hop.upside.entity.Task",
+      },
+      "name": "subTasks",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.JoinColumn(value = \"parent_task\", fkTable = \"tbl_task\", manyToOne = true)"
+      ],
+      "doc": "Collection of parent ids belonging to the sub tasks"
     }
   ]
 }

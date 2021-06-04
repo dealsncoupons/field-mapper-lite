@@ -8,15 +8,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 public class SelectTemplate {
 
     private static final Logger log = LoggerFactory.getLogger(SelectTemplate.class);
-    private static final LocalCache cache = LocalCache.getInstance();
 
-    public static <E extends Hydrant> E selectOne(String query, Class<?> type, DbSelect resolver, Object[] args) {
+    public static <E extends Hydrate> E selectOne(E instance, String query, DbSelect resolver, Object[] args) {
         try (Connection connection = ConnectionProvider.getConnection()) {
-            return selectOne(query, type, resolver, args, connection);
+            return selectOne(instance, query, resolver, args, connection);
         } catch (Exception e) {
             String errorMessage = "Problem executing fetch query";
             log.error(errorMessage, e);
@@ -24,7 +24,7 @@ public class SelectTemplate {
         }
     }
 
-    public static <E extends Hydrant> E selectOne(String query, Class<?> type, DbSelect resolver, Object[] args, Connection conn) {
+    public static <E extends Hydrate> E selectOne(E instance, String query, DbSelect resolver, Object[] args, Connection conn) {
         try (PreparedStatement ps = conn.prepareStatement(query)) {
             for (int i = 0; i < args.length; i++) {
                 ps.setObject(i + 1, args[i]);
@@ -32,9 +32,9 @@ public class SelectTemplate {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return EntityInstance.create(type).select(rs, resolver, conn, cache);
+                    return instance.select(rs, resolver, conn, LocalCache.getInstance());
                 }
-                return null;
+                throw new Exception("No entity was found with given criteria.");
             }
         } catch (Exception e) {
             String errorMessage = "Problem executing fetch query";
@@ -43,9 +43,9 @@ public class SelectTemplate {
         }
     }
 
-    public static <T extends Hydrant> Collection<T> selectList(String query, Class<?> type, DbSelect resolver, Object[] args) {
+    public static <T extends Hydrate> Collection<T> selectList(Supplier<T> newInstance, String query, DbSelect resolver, Object[] args) {
         try (Connection connection = ConnectionProvider.getConnection()) {
-            return selectList(query, type, resolver, args, connection);
+            return selectList(newInstance, query, resolver, args, connection);
         } catch (Exception e) {
             String errorMessage = "Problem executing fetch query";
             log.error(errorMessage, e);
@@ -53,7 +53,7 @@ public class SelectTemplate {
         }
     }
 
-    public static <T extends Hydrant> Collection<T> selectList(String query, Class<?> type, DbSelect resolver, Object[] args, Connection conn) {
+    public static <T extends Hydrate> Collection<T> selectList(Supplier<T> newInstance, String query, DbSelect resolver, Object[] args, Connection conn) {
         try (PreparedStatement ps = conn.prepareStatement(query)) {
             for (int i = 0; i < args.length; i++) {
                 ps.setObject(i + 1, args[i]);
@@ -62,7 +62,7 @@ public class SelectTemplate {
             Collection<T> result = new ArrayList<>();
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    T entity = EntityInstance.create(type).select(rs, resolver, conn, cache);
+                    T entity = newInstance.get().select(rs, resolver, conn, LocalCache.getInstance());
                     result.add(entity);
                 }
                 return result;

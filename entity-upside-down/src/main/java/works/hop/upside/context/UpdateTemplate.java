@@ -10,7 +10,7 @@ public class UpdateTemplate {
 
     static final Logger log = LoggerFactory.getLogger(UpdateTemplate.class);
 
-    public static <E extends Hydrant> E updateOne(E entity, Map<String, Object> columnValues) {
+    public static <E extends Hydrate> E updateOne(E entity, Map<String, Object> columnValues) {
         Connection connection = null;
         try {
             connection = ConnectionProvider.getConnection();
@@ -40,7 +40,7 @@ public class UpdateTemplate {
         }
     }
 
-    public static <E extends Hydrant> E updateOne(E entity, Map<String, Object> columnValues, Connection connection) {
+    public static <E extends Hydrate> E updateOne(E entity, Map<String, Object> columnValues, Connection connection) {
         try {
             return entity.update(columnValues, connection);
         } catch (Exception e) {

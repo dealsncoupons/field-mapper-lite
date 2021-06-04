@@ -1,174 +1,326 @@
+// This entity class is AUTO-GENERATED, so there's no point of modifying it
 package works.hop.upside.entity;
 
+import java.lang.IllegalAccessException;
+import java.lang.InstantiationException;
+import java.lang.NoSuchMethodException;
+import java.lang.Object;
+import java.lang.Override;
+import java.lang.RuntimeException;
+import java.lang.String;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.apache.kafka.connect.data.Struct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import works.hop.javro.jdbc.annotation.Column;
+import works.hop.javro.jdbc.annotation.Id;
+import works.hop.javro.jdbc.annotation.JoinColumn;
+import works.hop.javro.jdbc.annotation.Metadata;
+import works.hop.javro.jdbc.annotation.Table;
+import works.hop.javro.jdbc.annotation.Temporal;
 import works.hop.upside.context.DbSelect;
-import works.hop.upside.context.Hydrant;
+import works.hop.upside.context.Hydrate;
 import works.hop.upside.context.InsertTemplate;
 import works.hop.upside.context.LocalCache;
-import works.hop.upside.entity.contract.IAccount;
+import works.hop.upside.relations.EntityInfo;
 import works.hop.upside.relations.EntityQuery;
+import works.hop.upside.relations.FieldInfo;
+import works.hop.upside.relations.FieldInfoBuilder;
 
-import java.sql.*;
-import java.util.Map;
-import java.util.UUID;
-
+@Table("tbl_account")
 public class Account implements IAccount {
+  private static final Logger log = LoggerFactory.getLogger(Account.class);
 
-    private static final Logger log = LoggerFactory.getLogger(Account.class);
+  @Id
+  private UUID id;
 
-    private UUID id;
-    private String username;
-    private String password;
-    private User user;
-    private Date dateCreated;
+  @Column("user_name")
+  private String username;
 
-    public Account() {
-        super();
+  @Column("access_code")
+  private String password;
+
+  @JoinColumn(
+      value = "user_id",
+      fkTable = "tbl_user"
+  )
+  private User user;
+
+  @Column(
+      value = "date_created",
+      updatable = false
+  )
+  @Temporal
+  private LocalDate dateCreated;
+
+  @Metadata
+  private final EntityInfo entityInfo;
+
+  public Account() {
+    this.entityInfo = initEntityInfo();
+  }
+
+  public Account(final UUID id, final String username, final String password, final User user,
+      final LocalDate dateCreated) {
+    this.id = id;
+    this.username = username;
+    this.password = password;
+    this.user = user;
+    this.dateCreated = dateCreated;
+    this.entityInfo = initEntityInfo();
+  }
+
+  @Override
+  public UUID getId() {
+    return this.id;
+  }
+
+  @Override
+  public String getUsername() {
+    return this.username;
+  }
+
+  @Override
+  public String getPassword() {
+    return this.password;
+  }
+
+  @Override
+  public User getUser() {
+    return this.user;
+  }
+
+  @Override
+  public LocalDate getDateCreated() {
+    return this.dateCreated;
+  }
+
+  @Override
+  public EntityInfo getEntityInfo() {
+    return this.entityInfo;
+  }
+
+  @Override
+  public EntityInfo initEntityInfo() {
+    List<FieldInfo> fields = new ArrayList<>();
+    EntityInfo entityInfo = new EntityInfo();
+    entityInfo.setTableName("tbl_account");
+    FieldInfo id = FieldInfoBuilder.builder().name("id").isId(true).type(java.util.UUID.class).build();
+    fields.add(id);
+    FieldInfo username = FieldInfoBuilder.builder().name("username").columnName("user_name").build();
+    fields.add(username);
+    FieldInfo password = FieldInfoBuilder.builder().name("password").columnName("access_code").build();
+    fields.add(password);
+    FieldInfo user = FieldInfoBuilder.builder().name("user").relational(true).columnName("user_id").joinTable("tbl_user").type(works.hop.upside.entity.User.class).build();
+    fields.add(user);
+    FieldInfo dateCreated = FieldInfoBuilder.builder().name("dateCreated").columnName("date_created").updatable(false).type(java.time.LocalDate.class).temporal(true).build();
+    fields.add(dateCreated);
+    entityInfo.setFields(fields);
+    return entityInfo;
+  }
+
+  public <O> O get(String property) {
+    switch (property) {
+      case "id": 
+      return (O) this.id;
+      case "username": 
+      return (O) this.username;
+      case "password": 
+      return (O) this.password;
+      case "user": 
+      return (O) this.user;
+      case "dateCreated": 
+      return (O) this.dateCreated;
+      default: 
+      return null;
     }
+  }
 
-    public Account(UUID id, String username, String password, User user) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.user = user;
+  public <O> void set(String property, O value) {
+    switch (property) {
+      case "id": 
+      this.id = (java.util.UUID) value; 
+      break;
+      case "username": 
+      this.username = (java.lang.String) value; 
+      break;
+      case "password": 
+      this.password = (java.lang.String) value; 
+      break;
+      case "user": 
+      this.user = (works.hop.upside.entity.User) value; 
+      break;
+      case "dateCreated": 
+      this.dateCreated = (java.time.LocalDate) value; 
+      break;
+      default: 
+      break;
     }
+  }
 
-    @Override
-    public UUID getId() {
-        return id;
-    }
+  @Override
+  public <E extends Hydrate> E refresh(Struct record) {
+     entityInfo.getFields().forEach(field -> {
+         if(!field.isCollection){
+             set(field.name, field.type.cast(record.get(field.columnName)));
+         }
+     });
+     return (E) this;
+  }
 
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public User getUser() {
-        return user;
-    }
-
-    @Override
-    public Date getDateCreated() {
-        return dateCreated;
-    }
-
-    @Override
-    public Account select(ResultSet rs, DbSelect resolver, Connection connection, LocalCache cache) {
-        synchronized (this) {
-            try {
-                this.id = rs.getObject("id", UUID.class);
-                if (cache.get(this.id, "tbl_account").isPresent()) {
-                    return (Account) cache.get(this.id, "tbl_account").get();
-                } else {
-                    cache.add(this.id, this, "tbl_account");
-                    this.username = rs.getString("user_name");
-                    this.password = rs.getString("access_code");
-                    UUID userId = rs.getObject("user_id", UUID.class);
-                    this.user = resolver.selectByIdColumn("tbl_user", "id", userId, User.class, connection);
-                    this.dateCreated = rs.getDate("date_created");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new RuntimeException("Cannot resolve a property", e);
+  @Override
+  public <E extends Hydrate> E insert(Connection connection) {
+    getEntityInfo().getFields().stream().filter(fieldInfo -> fieldInfo.isRelational).forEach(fieldInfo -> {
+        if (!fieldInfo.isCollection) {
+            if (this.get(fieldInfo.name) != null) {
+                set(fieldInfo.name, InsertTemplate.insertOne(get(fieldInfo.name), connection));
+            }
+        } else {
+            if (this.get(fieldInfo.name) != null) {
+                Collection<Hydrate> collection = get(fieldInfo.name);
+                set(fieldInfo.name, collection.stream().map(entity -> InsertTemplate.insertOne(entity, connection)).collect(Collectors.toList()));
             }
         }
-        return this;
-    }
+    });
 
-    @Override
-    public Account insert(Connection connection) {
-        if (this.user != null) {
-            this.user = InsertTemplate.insertOne(this.user, connection);
-        }
-        String query = "insert into tbl_account (user_name, access_code, user_id) " +
-                "values (?, ?, ?)";
-        try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, this.username);
-            ps.setString(2, this.password);
-            ps.setObject(3, this.user.getId());
+    Map<String, Optional<Object>> parameters = new LinkedHashMap<>();
+    extractEntityValues(parameters, this, this.entityInfo);
 
-            int rowsAffected = ps.executeUpdate();
-            log.info("{} row(s) affected after insert operation", rowsAffected);
+    String[] orderedColumns = parameters.entrySet().stream().filter(entry -> entry.getValue().isPresent())
+            .map(Map.Entry::getKey).toArray(String[]::new);
+    String query = EntityQuery.getInstance().insertOne(entityInfo.getTableName(), orderedColumns);
 
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    this.id = UUID.fromString(keys.getString(1));
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                log.warn("Could not retrieve generated id value", e);
+    try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        for (int i = 0; i < orderedColumns.length; i++) { //maintains order of columns-to-values as they appear in the query
+            if(parameters.get(orderedColumns[i]).isPresent()) {
+                ps.setObject(i + 1, parameters.get(orderedColumns[i]).get());
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Problem executing insert query", e);
         }
 
-        return this;
+        int rowsAffected = ps.executeUpdate();
+        log.info("{} row(s) affected after insert operation", rowsAffected);
+
+        try (ResultSet keys = ps.getGeneratedKeys()) {
+           if (keys.next()) {
+              this.id = UUID.fromString(keys.getString(1));
+           }
+        } catch (SQLException e) {
+           e.printStackTrace();
+           log.warn("Could not retrieve generated id value", e);
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Problem executing insert query", e);
     }
 
-    @Override
-    public <E extends Hydrant> E update(Map<String, Object> columnValues, Connection connection) {
-        if (columnValues.containsKey("username")) {
-            this.username = (String) columnValues.get("username");
-        }
-        if (columnValues.containsKey("password")) {
-            this.password = (String) columnValues.get("password");
-        }
-        if (columnValues.containsKey("user")) {
-            this.user = (User) columnValues.get("user");
-        }
+    return (E) this;
+  }
 
-        String query = EntityQuery.getInstance().updateOne("tbl_account", new String[]{"id"}, new String[]{"username", "password", "user_id"});
-        try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, this.username);
-            ps.setString(2, this.password);
-            ps.setObject(3, this.user != null ? this.user.getId() : null);
-            ps.setObject(4, this.getId());
-
-            int rowsAffected = ps.executeUpdate();
-            log.info("{} row(s) affected after update operation", rowsAffected);
-
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) {
-                    this.id = UUID.fromString(keys.getString(1));
+  @Override
+  public <E extends Hydrate> E select(ResultSet rs, DbSelect resolver, Connection connection,
+      LocalCache cache) {
+    try {
+        this.id = rs.getObject("id", UUID.class);
+        String tableName =getEntityInfo().getTableName();
+        if (cache.get(this.id, tableName).isPresent()) {
+            return (E) cache.get(this.id, tableName).get();
+        } else {
+            cache.add(this.id, this, tableName);
+            for(FieldInfo field : getEntityInfo().getFields()){
+                if(field.isRelational){
+                    if(!field.isCollection){
+                        UUID fieldId = rs.getObject(field.columnName, UUID.class);
+                        if (fieldId != null) {
+                            set(field.name, resolver.selectByIdColumn((Hydrate)field.type.getConstructor().newInstance(), field.joinTable, "id", fieldId, connection));
+                        }
+                    }
+                    else{
+                        set(field.name, resolver.selectByJoinColumn(Task::new, entityInfo.getTableName(), "id", field.joinTable, field.columnName, field.columnName, this.id, connection));
+                    }
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                log.warn("Could not retrieve generated id value", e);
+                else if(field.isEmbedded){
+                    Hydrate embeddedField = get(field.name);
+                    if(embeddedField != null){
+                        embeddedField.select(rs, resolver, connection, cache);
+                    }
+                    else{
+                        set(field.name, ((Hydrate)field.type.getConstructor().newInstance()).select(rs, resolver, connection, cache));
+                    }
+                }
+                else{
+                    if(field.isTemporal) {
+                         set(field.name, rs.getObject(field.columnName, field.type));
+                     }
+                     else{
+                         set(field.name, rs.getObject(field.columnName));
+                     }
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Problem executing update query", e);
+        }
+    } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Cannot resolve a property", e);
+    }
+    return (E)this;
+  }
+
+  @Override
+  public <E extends Hydrate> E update(Map<String, Object> columnValues, Connection connection) {
+    columnValues.forEach(this::set);
+
+    Map<String, Optional<Object>> parameters = new LinkedHashMap<>();
+    extractEntityValues(parameters, this, this.entityInfo);
+
+    String[] idColumns = {"id"};
+    String[] valueColumns = parameters.keySet().stream()
+            .filter(o -> Arrays.stream(idColumns).noneMatch(i -> i.equals(o))).toArray(String[]::new);
+    String query = EntityQuery.getInstance().updateOne(entityInfo.getTableName(), idColumns, valueColumns);
+
+    String[] orderedColumns = Arrays.copyOf(valueColumns, valueColumns.length + idColumns.length);
+    System.arraycopy(idColumns, 0, orderedColumns, valueColumns.length, idColumns.length);
+    try (PreparedStatement ps = connection.prepareStatement(query)) {
+        for (int i = 0; i < orderedColumns.length; i++) { //maintains order of columns-to-values as they appear in the query
+            ps.setObject(i + 1, parameters.get(orderedColumns[i]).get());
         }
 
-        return (E) this;
+        int rowsAffected = ps.executeUpdate();
+        log.info("{} row(s) affected after update operation", rowsAffected);
+    } catch (SQLException e) {
+        e.printStackTrace();
+        throw new RuntimeException("Problem executing update query", e);
     }
 
-    @Override
-    public <E extends Hydrant> E delete(Connection connection) {
-        String query = EntityQuery.getInstance().deleteOne("tbl_account", new String[]{"id"});
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setObject(1, this.getId());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Problem executing delete query", e);
-        }
-        return (E) this;
-    }
+    return (E) this;
+  }
 
-    @Override
-    public <E extends Hydrant> E refresh(Struct record) {
-        this.username = record.getString("user_name");
-        this.password = record.getString("access_code");
-        this.dateCreated = new Date(record.getInt64("date_created"));
-        return (E) this;
-    }
+  @Override
+  public <E extends Hydrate> E delete(Connection connection) {
+    String query = EntityQuery.getInstance().deleteOne(entityInfo.getTableName(), new String[]{"id"});
+     try (PreparedStatement ps = connection.prepareStatement(query)) {
+         ps.setObject(1, this.getId());
+
+         int rowsAffected = ps.executeUpdate();
+         log.info("{} row(s) affected after delete operation", rowsAffected);
+     } catch (SQLException e) {
+         e.printStackTrace();
+         throw new RuntimeException("Problem executing delete query", e);
+     }
+     return (E)this;
+  }
 }

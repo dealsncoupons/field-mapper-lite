@@ -7,11 +7,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface JoinColumn {
-
-    String value() default "";
-
-    String fkTable() default "";
-
-    boolean updatable() default true;
+public @interface NoColumn {
 }
