@@ -6,13 +6,13 @@ import java.util.List;
 public class Vertex02<T> {
 
     private final T name;
+    private final List<Vertex02<T>> neighbours;
     private boolean visited;
     private boolean beingVisited;
-    private final List<Vertex02<T>> neighbours;
 
     public Vertex02(T name) {
         this.name = name;
-        this.neighbours  = new LinkedList<>();
+        this.neighbours = new LinkedList<>();
     }
 
     public T getName() {

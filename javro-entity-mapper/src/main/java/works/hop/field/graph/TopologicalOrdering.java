@@ -12,21 +12,6 @@ public class TopologicalOrdering<T> {
         this.sorted = new Stack<>();
     }
 
-    public Stack<Vertex<T>> getSorted() {
-        return sorted;
-    }
-
-    public void dfs(Vertex<T> vertex){
-        vertex.setVisited(true);
-        for(Vertex<T> neighbour : vertex.getNeighbours()){
-            if(!neighbour.isVisited()){
-                dfs(neighbour);
-            }
-        }
-
-        sorted.push(vertex);
-    }
-
     public static void main(String[] args) {
         TopologicalOrdering<String> topSort = new TopologicalOrdering<>();
 
@@ -50,16 +35,31 @@ public class TopologicalOrdering<T> {
         graph.get(5).addNeighbour(graph.get(2));
 
         //sort the graph topologically using dfs
-        for(int i = 0; i < graph.size(); i++){
-            if(!graph.get(i).isVisited()){
+        for (int i = 0; i < graph.size(); i++) {
+            if (!graph.get(i).isVisited()) {
                 topSort.dfs(graph.get(i));
             }
         }
 
         //print sorted graph by popping stack
         Stack<Vertex<String>> ordering = topSort.getSorted();
-        for(int i = 0; i < graph.size(); i++){
+        for (int i = 0; i < graph.size(); i++) {
             System.out.println(ordering.pop() + " -> ");
         }
+    }
+
+    public Stack<Vertex<T>> getSorted() {
+        return sorted;
+    }
+
+    public void dfs(Vertex<T> vertex) {
+        vertex.setVisited(true);
+        for (Vertex<T> neighbour : vertex.getNeighbours()) {
+            if (!neighbour.isVisited()) {
+                dfs(neighbour);
+            }
+        }
+
+        sorted.push(vertex);
     }
 }

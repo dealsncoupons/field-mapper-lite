@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 public class EntityMetadata {
 
-    public static Function<Class<?>, EntityInfo> getEntityInfo = entityType -> {
+    public static Function<Class<?>, EntityInfo> entityInfoByType = entityType -> {
         if (IAccount.class.isAssignableFrom(entityType)) {
             return accountInfo().get();
         }
@@ -62,7 +62,8 @@ public class EntityMetadata {
         FieldInfo name = new FieldInfo(String.class, "name", "name");
         FieldInfo done = new FieldInfo(Boolean.class, "completed", "completed");
         FieldInfo next = new FieldInfo(ITodo.class, "nextTask", "next_task", true, false, "");
+        FieldInfo prev = new FieldInfo(ITodo.class, "parentTask", "parent_task", true, false, "");
         FieldInfo subTasks = new FieldInfo(ITodo.class, "subTasks", "parent_task", true, true, "");
-        return () -> new EntityInfo("tbl_task", List.of(id, name, done, next, subTasks));
+        return () -> new EntityInfo("tbl_task", List.of(id, name, done, next, prev, subTasks));
     }
 }

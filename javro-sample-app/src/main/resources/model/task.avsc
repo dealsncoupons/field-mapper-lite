@@ -1,14 +1,18 @@
 {
   "type": "record",
   "namespace": "works.hop.sample.app.model",
-  "annotations": ["works.hop.javro.jdbc.annotation.Table(\"tbl_task\")"],
+  "annotations": [
+    "works.hop.javro.jdbc.annotation.Table(\"tbl_task\")"
+  ],
   "name": "Task",
   "doc": "A task with sub-tasks",
   "fields": [
     {
       "type": "java.util.UUID",
       "name": "id",
-      "annotations": ["works.hop.javro.jdbc.annotation.Id"],
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Id"
+      ],
       "doc": "The primary key identifier for the task"
     },
     {
@@ -24,13 +28,36 @@
     {
       "type": "java.time.LocalDate",
       "name": "dateCreated",
-      "annotations": ["works.hop.javro.jdbc.annotation.Column(\"date_created\")"],
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"date_created\")"
+      ],
       "doc": "Commencement date of the task"
     },
     {
       "type": "java.util.UUID",
+      "name": "nextTask",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"next_task\")"
+      ],
+      "doc": "The scheduled next task's id"
+    },
+    {
+      "type": "java.util.UUID",
       "name": "parentTask",
-      "annotations": ["works.hop.javro.jdbc.annotation.Column(\"parent_task\")"],
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"parent_task\")"
+      ],
+      "doc": "The parent task's id"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "works.hop.sample.app.model.Task",
+      },
+      "name": "subTasks",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.JoinColumn(\"parent_task\")"
+      ],
       "doc": "The parent task's id"
     }
   ]

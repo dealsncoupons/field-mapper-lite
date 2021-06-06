@@ -25,12 +25,22 @@
       "doc": "Commencement date of the task"
     },
     {
+      "type": "works.hop.sample.app.model.Task",
+      "name": "nextTask",
+      "doc": "The next scheduled task if one exists"
+    },
+    {
+      "type": "works.hop.sample.app.model.Task",
+      "name": "parentTask",
+      "doc": "The task's parent if one exists"
+    },
+    {
       "type": {
         "type": "array",
         "items": "works.hop.sample.app.model.Task"
       },
       "name": "subTasks",
-      "doc": "A list of sub-tasks under the parent task"
+      "doc": "A list of sub-tasks under this parent task"
     }
   ]
 }

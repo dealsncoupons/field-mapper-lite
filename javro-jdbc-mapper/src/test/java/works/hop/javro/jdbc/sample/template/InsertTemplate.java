@@ -38,9 +38,7 @@ public class InsertTemplate {
         try {
             conn = ConnectionProvider.getConnection();
             conn.setAutoCommit(false);
-            EntityInfo entityInfo = EntityMetadata.getEntityInfo.apply(entity.getClass());
-            Map<String, Object> record = insertionRecord(entity, entityInfo);
-            E insertResult = insertInTransaction(entity, entityInfo, record, conn);
+            E insertResult = insertOne(entity, conn);
             conn.commit();
             return insertResult;
         } catch (Exception e) {
@@ -65,7 +63,13 @@ public class InsertTemplate {
         }
     }
 
-    private static <E extends Unreflect> Map<String, Object> insertionRecord(E entitySource, EntityInfo entityInfo) {
+    private static <E extends Unreflect> E insertOne(E entity, Connection conn) {
+        EntityInfo entityInfo = EntityMetadata.entityInfoByType.apply(entity.getClass());
+        Map<String, Object> record = columnsToInsert(entity, entityInfo);
+        return insertInTransaction(entity, entityInfo, record, conn);
+    }
+
+    private static <E extends Unreflect> Map<String, Object> columnsToInsert(E entitySource, EntityInfo entityInfo) {
         return entityInfo.getFields().stream()
                 .filter(field -> !field.isId)
                 .filter(field -> !field.isRelational)
@@ -82,8 +86,8 @@ public class InsertTemplate {
                     if (!field.isCollection) {
                         Unreflect fkEntityValue = entitySource.get(field.name);
                         if (fkEntityValue != null) {
-                            EntityInfo fkEntityInfo = EntityMetadata.getEntityInfo.apply(field.type);
-                            Map<String, Object> fkFieldRecord = insertionRecord(fkEntityValue, fkEntityInfo);
+                            EntityInfo fkEntityInfo = EntityMetadata.entityInfoByType.apply(field.type);
+                            Map<String, Object> fkFieldRecord = columnsToInsert(fkEntityValue, fkEntityInfo);
 
                             String insertedPkFieldName = pkFieldName(entityInfo);
                             Object insertedPkFieldValue = inserted.get(insertedPkFieldName);
@@ -99,8 +103,8 @@ public class InsertTemplate {
                         Collection<? extends Unreflect> fkCollectionFieldValue = entitySource.get(field.name);
                         if (fkCollectionFieldValue != null) {
                             for (Unreflect fkEntityValue : fkCollectionFieldValue) {
-                                EntityInfo fkEntityInfo = EntityMetadata.getEntityInfo.apply(field.type);
-                                Map<String, Object> fkFieldRecord = insertionRecord(fkEntityValue, fkEntityInfo);
+                                EntityInfo fkEntityInfo = EntityMetadata.entityInfoByType.apply(field.type);
+                                Map<String, Object> fkFieldRecord = columnsToInsert(fkEntityValue, fkEntityInfo);
 
                                 String insertedPkFieldName = pkFieldName(entityInfo);
                                 Object insertedPkFieldValue = inserted.get(insertedPkFieldName);

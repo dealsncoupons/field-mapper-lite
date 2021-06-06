@@ -6,8 +6,10 @@ pluginManagement {
 }
 
 rootProject.name = 'field-mapper-lite'
-include 'javro-entity-mapper'
+include 'entity-mapper-api'
+include 'entity-upside-down'
 include 'javro-gen-plugin'
-include 'javro-jdbc-mapper'
-include 'javro-sample-app'
+//include 'javro-entity-mapper'
+//include 'javro-jdbc-mapper'
+//include 'javro-sample-app'
 

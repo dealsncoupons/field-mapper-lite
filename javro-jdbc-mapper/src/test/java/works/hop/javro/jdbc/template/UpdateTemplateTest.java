@@ -1,6 +1,7 @@
 package works.hop.javro.jdbc.template;
 
 import org.junit.Test;
+import works.hop.javro.jdbc.template.toremove.UpdateTemplate;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

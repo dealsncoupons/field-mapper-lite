@@ -27,8 +27,9 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-        String defaultSrcDir = "javro-sample-app/src/main/resources/model";
-        String defaultDestDir = "javro-sample-app/src/main/java";
+        String defaultSrcDir = "entity-upside-down/src/main/resources/avro";
+//        String defaultDestDir = "entity-upside-down/build/generated-sources";
+        String defaultDestDir = "entity-upside-down/src/main/java";
         String srcDir = args != null && args.length > 0 ? args[0] : defaultSrcDir;
         String destDir = args != null && args.length > 0 ? args[0] : defaultDestDir;
         Parser.generateJavro(srcDir, destDir);

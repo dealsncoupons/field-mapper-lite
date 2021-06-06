@@ -1,31 +1,33 @@
 package works.hop.javro.jdbc.sample.account;
 
+import works.hop.javro.jdbc.sample.Unreflect;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public interface IAccount {
-    void setId(UUID id);
-
+public interface IAccount extends Unreflect {
     UUID getId();
 
-    void setDateCreated(LocalDate dateCreated);
+    void setId(UUID id);
 
     LocalDate getDateCreated();
 
-    void setLastUpdated(LocalDateTime lastUpdated);
+    void setDateCreated(LocalDate dateCreated);
 
     LocalDateTime getLastUpdated();
 
-    void setUsername(String username);
+    void setLastUpdated(LocalDateTime lastUpdated);
 
     String getUsername();
 
-    void setAccessCode(String accessCode);
+    void setUsername(String username);
 
     String getAccessCode();
 
-    void setMember(IMember member);
+    void setAccessCode(String accessCode);
 
     IMember getMember();
+
+    void setMember(IMember member);
 }

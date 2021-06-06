@@ -13,21 +13,6 @@ public class ShortestPath {
         graph.get(0).setMinDistance(0);
     }
 
-    public void compute(){
-        Stack<Vertex01<String>> sortedStack = topSorted.getSorted();
-        while(!sortedStack.isEmpty()){
-            Vertex01<String> u = sortedStack.pop();
-            for(Edge<String> e : u.getNeighbours()){
-                Vertex01<String> v = e.getTarget();
-
-                if(v.getMinDistance() > u.getMinDistance() + e.getWeight()){
-                    v.setMinDistance((u.getMinDistance() + e.getWeight()));
-                    v.setPredecessor(u);
-                }
-            }
-        }
-    }
-
     public static void main(String[] args) {
         Vertex01<String> v0 = new Vertex01<>("S");
         Vertex01<String> v1 = new Vertex01<>("A");
@@ -63,8 +48,23 @@ public class ShortestPath {
         shortestPath.compute();
 
         //print to see results
-        for(Vertex01<String> v : graph){
+        for (Vertex01<String> v : graph) {
             System.out.println("distance from s: " + v.getMinDistance() + " - " + v.getPredecessor());
+        }
+    }
+
+    public void compute() {
+        Stack<Vertex01<String>> sortedStack = topSorted.getSorted();
+        while (!sortedStack.isEmpty()) {
+            Vertex01<String> u = sortedStack.pop();
+            for (Edge<String> e : u.getNeighbours()) {
+                Vertex01<String> v = e.getTarget();
+
+                if (v.getMinDistance() > u.getMinDistance() + e.getWeight()) {
+                    v.setMinDistance((u.getMinDistance() + e.getWeight()));
+                    v.setPredecessor(u);
+                }
+            }
         }
     }
 }

@@ -1,0 +1,84 @@
+{
+  "type": "record",
+  "namespace": "works.hop.upside.entity",
+  "name": "User",
+  "annotations": [
+    "works.hop.javro.jdbc.annotation.Table(\"tbl_user\")"
+  ],
+  "doc": "User details",
+  "fields": [
+    {
+      "type": "java.util.UUID",
+      "name": "id",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Id"
+      ],
+      "doc": "The primary key identifier for the user"
+    },
+    {
+      "name": "firstName",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"first_name\")"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "lastName",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"last_name\")"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "emailAddress",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(\"email_address\")"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "address",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Embedded"
+      ],
+      "type": {
+        "type": "record",
+        "name": "Address",
+        "annotations": [
+          "works.hop.javro.jdbc.annotation.Embeddable"
+        ],
+        "fields": [
+          {
+            "name": "city",
+            "type": "string",
+            "annotations": [
+              "works.hop.javro.jdbc.annotation.Column(\"addr_city\")"
+            ]
+          },
+          {
+            "name": "state",
+            "type": "string",
+            "annotations": [
+              "works.hop.javro.jdbc.annotation.Column(\"addr_state_prov\")"
+            ]
+          },
+          {
+            "name": "zipCode",
+            "type": "string",
+            "annotations": [
+              "works.hop.javro.jdbc.annotation.Column(\"addr_zip_code\")"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "dateCreated",
+      "annotations": [
+        "works.hop.javro.jdbc.annotation.Column(value=\"date_created\", updatable=false)",
+        "works.hop.javro.jdbc.annotation.Temporal"
+      ],
+      "type": "java.time.LocalDate"
+    }
+  ]
+}

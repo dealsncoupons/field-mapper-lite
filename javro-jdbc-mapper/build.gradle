@@ -25,6 +25,8 @@ repositories {
 }
 
 dependencies {
+    compileOnly project(":entity-mapper-api")
+
     compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     compileOnly group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
 

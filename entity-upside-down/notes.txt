@@ -1,0 +1,153 @@
+run a schema registry
+
+docker run -it --rm --name apicurio -p 8080:8080 apicurio/apicurio-registry-mem:1.3.2.Final
+
+run postgres docker container
+
+docker create volume pgdata
+
+docker run -d \
+--name pg-db \
+-p 5432:5432 \
+-e POSTGRES_USER=postgres \
+-e POSTGRES_PASSWORD=postgres \
+-v pgdata:/var/lib/postgresql/data \
+postgres:11.12
+
+In another terminal, exec into docker container
+
+docker exec -it pg-db /bin/bash
+
+locate the 'postgresql.conf' file
+
+find / -iname postgresql.conf (example location - /var/lib/postgresql/data/postgresql.conf)
+
+create and copy customized config into postgres
+
+docker cp ~/pgdata/postgresql.conf pg-db:/var/lib/postgresql/data/postgresql.conf
+docker cp ~/pgdata/offsets.dat pg-db:/var/lib/postgresql/data/offsets.dat
+docker cp ~/pgdata/dbhistory.dat pg-db:/var/lib/postgresql/data/dbhistory.dat
+
+in the terminal with exec running, examine the change is reflected
+
+cat /var/lib/postgresql/data/postgresql.conf
+
+bounce the container for good measure
+
+docker container restart pg-db
+
+connect postgres client
+
+docker run -it --rm --name pgsql_client -e PGPASSWORD=postgres --link pg-db:postgres postgres:11.12 psql -h postgres -U postgres
+
+--------------------------
+
+Mapping Scenario A - No Join Table
+---------------------------------------------------------------------
+
+Task (tbl_task)
+----------------------------------------------------------------------
+Java Type           |name           |DB Type            |DB column
+----------------------------------------------------------------------
+UUID                |id             |UUID               |id
+String name         |name           |varchar(32)        |name
+Boolean             |completed      |int(1)             |done
+Task                |nextTask       |UUID               |next_task
+Task                |dependsOn      |UUID               |parent_task
+[Task]              |subTasks       |---                |---
+----------------------------------------------------------------------
+
+1-to-1 mapping (Task/nextTask)
+select nt.* from tbl_task nt where nt.id = :next_task
+
+1-to-1 mapping (Task/dependsOn)
+select pt.* from tbl_task pt where pt.id = :parent_task
+
+*-to-1 mapping (Task/subTasks)
+select st.* from tbl_task st
+inner join tbl_task t on t.id = st.parent_task
+where st.id = :parent_task
+
+Assignee (tbl_assignee)
+----------------------------------------------------------------------
+Java Type           |name           |DB Type            |DB column
+----------------------------------------------------------------------
+UUID                |id             |UUID               |id
+String              |firstName      |varchar(32)        |first_name
+String              |lastName       |varchar(32)        |last_name
+[Assignment]        |assignments    |---                |---
+----------------------------------------------------------------------
+
+*-to-1 mapping (Assignee/assignments)
+select asm.* from tbl_assignment asm
+inner join tbl_assignee asg on asg.id = asm.assignee_id
+where asm.id = :assignee_id
+
+Assignment (tbl_assignment)
+----------------------------------------------------------------------
+Java Type           |name           |DB Type            |DB column
+----------------------------------------------------------------------
+UUID                |id             |UUID               |id
+Task                |task           |UUID               |task_id
+Assignee            |assignee       |UUID               |assignee_id
+Date                |dateAssigned   |Date               |date_assigned
+----------------------------------------------------------------------
+
+1-to-1 mapping (Assignment/task)
+select t.* from tbl_task t where t.id = :task_id
+
+1-to-1 mapping (Assignment/assignee)
+select asg.* from tbl_assignee asg where asg.id = :assignee_id
+
+----------------------------------------------------------------------
+Mapping Scenario B - Using Join Table
+----------------------------------------------------------------------
+
+Task (tbl_task)
+----------------------------------------------------------------------
+Java Type           |name           |DB Type            |DB column
+----------------------------------------------------------------------
+UUID                |id             |UUID               |id
+String name         |name           |varchar(32)        |name
+Boolean             |completed      |int(1)             |done
+Task                |nextTask       |---                |---
+Task                |dependsOn      |---                |---
+[Task]              |subTasks       |---                |---
+----------------------------------------------------------------------
+
+1-to-1 mapping (Task/nextTask)
+select nt.* from tbl_task nt
+inner join tbl_task_relation tr on tr.task_id = nt.id
+where tr.next_task = :id
+
+1-to-1 mapping (Task/dependsOn)
+select pt.* from tbl_task pt
+inner join tbl_task_relation tr on tr.task_id = pt.id
+where tr.parent_task = :id
+
+*-to-1 mapping (Task/subTasks)
+select st.* from tbl_task st
+inner join tbl_task_relation tr on tr.parent_task = st.id
+where tr.task_id = :id
+
+Assignee (tbl_assignee) - stays the same
+----------------------------------------------------------------------
+
+Assignment (tbl_assignment) - stays the same
+----------------------------------------------------------------------
+
+Relation (tbl_task_relation)
+----------------------------------------------------------------------
+Java Type           |name           |DB Type            |DB column
+----------------------------------------------------------------------
+UUID                |taskId         |UUID               |task_id
+Task                |nextTask       |UUID               |next_task
+Task                |dependsOn      |UUID               |parent_task
+----------------------------------------------------------------------
+
+1-to-1 mapping (Task/nextTask)
+select nt.* from tbl_task nt where nt.id = :next_task
+
+1-to-1 mapping (Task/dependsOn)
+select pt.* from tbl_task pt where pt.id = :parent_task
+

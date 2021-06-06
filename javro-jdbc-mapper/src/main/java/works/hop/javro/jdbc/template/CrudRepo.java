@@ -2,6 +2,9 @@ package works.hop.javro.jdbc.template;
 
 import works.hop.javro.jdbc.reflect.ReflectionUtil;
 import works.hop.javro.jdbc.resolver.AbstractResolver;
+import works.hop.javro.jdbc.template.toremove.InsertTemplate;
+import works.hop.javro.jdbc.template.toremove.SelectTemplate;
+import works.hop.javro.jdbc.template.toremove.UpdateTemplate;
 
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;

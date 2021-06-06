@@ -1,12 +1,12 @@
 package works.hop.javro.jdbc.sample.todo;
 
-import works.hop.javro.jdbc.sample.EntityProxyFactory;
-import works.hop.javro.jdbc.sample.EntitySourceFactory;
-import works.hop.javro.jdbc.sample.template.InsertTemplate;
 import works.hop.javro.jdbc.sample.template.SelectTemplate;
 import works.hop.javro.jdbc.sample.template.UpdateTemplate;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 public class TodosApp {
 
@@ -41,62 +41,65 @@ public class TodosApp {
 //        System.out.println("saved -> " + saved.getId());
 
         //select task just created
-        UUID findId = UUID.fromString("117db1d0-b4ca-11eb-a81c-0a0027000015"); //saved.getId()
-        ITodo findTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findId});
-        System.out.println("selected -> " + findTask.getId());
+        UUID makeBreakfastId = UUID.fromString("fab3906e-b50a-11eb-b13c-0242ac110002"); //saved.getId()
+        ITodo makeBreakfast = SelectTemplate.selectOne(ITodo.class, new Object[]{makeBreakfastId}, new HashMap<>());
+        System.out.println("selected -> " + makeBreakfast.getId());
+
+        UUID makePancakeId = UUID.fromString("fab6a862-b50a-11eb-b13c-0242ac110002");
+        ITodo makePancake = SelectTemplate.selectOne(ITodo.class, new Object[]{makePancakeId}, new HashMap<>());
+        System.out.println("selected -> " + makePancake.getId());
 
         //modify found task
-//        findTask.setNextTask(task11);
-//        findTask.getSubTasks().remove(0);
+        makeBreakfast.setNextTask(makePancake);
 
         //updated modified task
-        UpdateTemplate.updateOne(findTask);
-        ITodo updatedTask = SelectTemplate.selectOne(ITodo.class, new Object[]{findTask.getId()});
+        UpdateTemplate.updateOne(makeBreakfast);
+        ITodo updatedTask = SelectTemplate.selectOne(ITodo.class, new Object[]{makeBreakfast.getId()}, new HashMap<>());
         System.out.println("updated -> " + updatedTask.getId());
     }
 
     public static void createEntityProxies() {
-        Map<String, Object> task1 = new HashMap<>();
-        task1.put("name", "make breakfast");
-        task1.put("completed", false);
+        Todo task1 = new Todo();
+        task1.set("name", "make breakfast");
+        task1.set("completed", false);
 
-        Map<String, Object> task11 = new HashMap<>();
-        task11.put("name", "pour milk");
-        task11.put("completed", false);
+        Todo task11 = new Todo();
+        task11.set("name", "pour milk");
+        task11.set("completed", false);
 
-        Map<String, Object> task12 = new HashMap<>();
-        task12.put("name", "make pancake");
-        task12.put("completed", false);
+        Todo task12 = new Todo();
+        task12.set("name", "make pancake");
+        task12.set("completed", false);
 
-        Map<String, Object> task121 = new HashMap<>();
-        task121.put("name", "heat up skillet");
-        task121.put("completed", false);
+        Todo task121 = new Todo();
+        task121.set("name", "heat up skillet");
+        task121.set("completed", false);
 
-        Map<String, Object> task122 = new HashMap<>();
-        task122.put("name", "pour prepared mix");
-        task122.put("completed", false);
+        Todo task122 = new Todo();
+        task122.set("name", "pour prepared mix");
+        task122.set("completed", false);
 
-        Map<String, Object> task123 = new HashMap<>();
-        task123.put("name", "cook to golden brown");
-        task123.put("completed", false);
+        Todo task123 = new Todo();
+        task123.set("name", "cook to golden brown");
+        task123.set("completed", false);
 
-        Map<String, Object> task13 = new HashMap<>();
-        task13.put("name", "serve when ready");
-        task13.put("completed", false);
+        Todo task13 = new Todo();
+        task13.set("name", "serve when ready");
+        task13.set("completed", false);
 
         List<ITodo> task1SubList = new LinkedList<>();
-        task1SubList.add(EntityProxyFactory.create(ITodo.class, task11));
-        task1SubList.add(EntityProxyFactory.create(ITodo.class, task12));
-        task1SubList.add(EntityProxyFactory.create(ITodo.class, task13));
-        task1.put("subTasks", task1SubList);
+        task1SubList.add(task11);
+        task1SubList.add(task12);
+        task1SubList.add(task13);
+        task1.set("subTasks", task1SubList);
 
         List<ITodo> task12SubList = new LinkedList<>();
-        task12SubList.add(EntityProxyFactory.create(ITodo.class, task121));
-        task12SubList.add(EntityProxyFactory.create(ITodo.class, task122));
-        task12SubList.add(EntityProxyFactory.create(ITodo.class, task123));
-        task12.put("subTasks", task12SubList);
+        task12SubList.add(task121);
+        task12SubList.add(task122);
+        task12SubList.add(task123);
+        task12.set("subTasks", task12SubList);
 
-        ITodo theTask = EntityProxyFactory.create(ITodo.class, task1);
+        ITodo theTask = task1;
         printTasks("", List.of(theTask));
     }
 
