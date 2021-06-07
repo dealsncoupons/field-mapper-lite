@@ -8,7 +8,7 @@ import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import works.hop.upside.context.LocalCache;
-import works.hop.upside.dispatcher.ChangeDispatcherChain;
+import works.hop.upside.entity.dispatcher.ChangeDispatcherChain;
 
 import java.util.List;
 
@@ -23,19 +23,24 @@ public class ChangeConsumer implements DebeziumEngine.ChangeConsumer<RecordChang
             log.info("Event key = {}", event.record().key());
 
             Struct sourceRecordValue = (Struct) event.record().value();
-            Envelope.Operation operation = Envelope.Operation.forCode((String) sourceRecordValue.get(OPERATION));
-            log.info("Event type - {}", operation.name());
+            if(sourceRecordValue != null) {
+                Envelope.Operation operation = Envelope.Operation.forCode((String) sourceRecordValue.get(OPERATION));
+                log.info("Event type - {}", operation.name());
 
-            Struct payload = (Struct) sourceRecordValue.get(AFTER);
-            log.info("Event payload - {}", payload);
+                Struct before = (Struct) sourceRecordValue.get(BEFORE);
+                log.info("Event payload (before) - {}", before);
 
-            Struct source = (Struct) sourceRecordValue.get(SOURCE);
-            log.info("Event source - {}", source);
+                Struct after = (Struct) sourceRecordValue.get(AFTER);
+                log.info("Event payload (after) - {}", after);
 
-            String table = source.getString("table");
+                Struct source = (Struct) sourceRecordValue.get(SOURCE);
+                log.info("Event source - {}", source);
 
-            ChangeDispatcherChain.chain().dispatch(payload, table, LocalCache.getInstance());
-            committer.markProcessed(event);
+                String table = source.getString("table");
+
+                ChangeDispatcherChain.chain().dispatch(after, table, operation.name(), LocalCache.getInstance());
+                committer.markProcessed(event);
+            }
         }
     }
 }

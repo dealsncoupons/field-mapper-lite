@@ -28,8 +28,10 @@ public class Generator {
     final String insertTemplateClass = "works.hop.upside.context.InsertTemplate";
     final String entityQueryClass = "works.hop.upside.relations.EntityQuery";
     final String structClass = "org.apache.kafka.connect.data.Struct";
+    final String dispatcherInterface = "works.hop.upside.entity.dispatcher.ChangeDispatcher";
     final String[] metadataAnnotation = {"works.hop.javro.jdbc.annotation", "Metadata"};
     final TypesMap typesMap = TypesMap.instance(); //important to use this shared instance
+    private Progress progress;
 
     public Generator(Node node, List<String> additionalTypes, File destDir) {
         this.node = node;
@@ -48,6 +50,66 @@ public class Generator {
         } else {
             generateEntityInterface();
             generateEntityPojo();
+            generateEntityEventDispatcher();
+        }
+    }
+
+    private void generateEntityEventDispatcher() {
+        Optional<String> tableNameAnnotation = node.annotations.stream().filter(item -> item.contains(".Table")).findFirst();
+        String packageName = node.packageName == null ? "dispatcher" : String.format("%s.dispatcher", node.packageName);
+        if (tableNameAnnotation.isPresent()) {
+            //figure out the package name
+            String dispatcherClassName = String.format("%sEventDispatcher", node.name);
+            String annotation = tableNameAnnotation.get();
+            String tableName = annotation.substring(annotation.indexOf("(") + 1, annotation.lastIndexOf(")")).replaceAll("\\\\\"", "");
+
+            TypeSpec.Builder classBuilder = TypeSpec.classBuilder(dispatcherClassName)
+                    .addSuperinterface(typesMap.typeName(dispatcherInterface))
+                    .addModifiers(Modifier.PUBLIC);
+
+            //implement 'canHandle' method
+            MethodSpec canHandleMethod = MethodSpec.methodBuilder("canHandle")
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addParameter(ParameterSpec.builder(TypeName.get(String.class), "source").build())
+                    .addCode(CodeBlock.builder()
+                            .addStatement("String table = $S", tableName)
+                            .addStatement("return table.equals(source)").build())
+                    .returns(TypeName.BOOLEAN)
+                    .build();
+            classBuilder.addMethod(canHandleMethod);
+
+            //implement 'dispatch' method
+            MethodSpec dispatchMethod = MethodSpec.methodBuilder("dispatch")
+                    .addAnnotation(Override.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addParameter(ParameterSpec.builder(typesMap.typeName(structClass), "record").build())
+                    .addParameter(ParameterSpec.builder(TypeName.get(String.class), "source").build())
+                    .addParameter(ParameterSpec.builder(TypeName.get(String.class), "operation").build())
+                    .addParameter(ParameterSpec.builder(typesMap.typeName(localCacheClass), "cache").build())
+                    .addCode(CodeBlock.builder()
+                            .beginControlFlow(" if(record != null)")
+                            .addStatement("cache.get($T.fromString(record.getString(\"id\")), source).ifPresent(entity -> entity.refresh(record))",
+                                    UUID.class)
+                            .endControlFlow().build())
+                    .returns(TypeName.VOID)
+                    .build();
+            classBuilder.addMethod(dispatchMethod);
+
+            //create entity interface file
+            JavaFile dispatcherFile = JavaFile.builder(packageName, classBuilder.build())
+                    .addFileComment("This change event handler is AUTO-GENERATED, so there's no point of modifying it")
+                    .build();
+
+            //write to file system
+            try {
+                dispatcherFile.writeTo(destDir);
+            } catch (IOException e) {
+                e.printStackTrace(System.err);
+            }
+
+            //add dispatcher name to collection of dispatchers
+            progress.onEvent(Progress.DISPATCHERS, packageName, dispatcherClassName);
         }
     }
 
@@ -625,7 +687,6 @@ public class Generator {
                         .beginControlFlow("switch (property)");
         for (Node fieldNode : node.children) {
             TypeName typeName = typesMap.createFieldType(fieldNode);
-            String setter = "set" + capitalize(fieldNode.name);
             code.add("case $S: \n" +
                     "this.$L = ($L) value; \n" +
                     "break;\n", fieldNode.name, fieldNode.name, typeName.toString());
@@ -663,8 +724,7 @@ public class Generator {
     }
 
     public void generateEnum() {
-        TypeSpec.Builder builder = TypeSpec.enumBuilder(node.name)
-                .addModifiers(Modifier.PUBLIC);
+        TypeSpec.Builder builder = TypeSpec.enumBuilder(node.name).addModifiers(Modifier.PUBLIC);
 
         //add symbols
         for (String symbol : node.symbols) {
@@ -763,5 +823,9 @@ public class Generator {
                         return node.name;
                     }
                 }).findFirst().orElse("");
+    }
+
+    public void listener(Progress progress) {
+        this.progress = progress;
     }
 }

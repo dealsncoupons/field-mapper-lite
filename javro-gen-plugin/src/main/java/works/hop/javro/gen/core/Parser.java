@@ -41,17 +41,18 @@ public class Parser {
 
     public static void generateJavroUsingDir(File srcDir, File destDir) {
         File[] listOfFiles = srcDir.listFiles((dir, name) -> name.endsWith(".avsc"));
-
         if (listOfFiles != null) {
+            Progress progress = new Progress(destDir);
             for (File sourceFile : listOfFiles) {
-                generateJavroUsingFile(sourceFile, destDir);
+                generateJavroUsingFile(sourceFile, destDir, progress);
             }
+            progress.complete();
         } else {
             System.err.println("Could not find files from specified directory - '" + srcDir + "'");
         }
     }
 
-    public static void generateJavroUsingFile(File sourceFile, File outputDir) {
+    public static void generateJavroUsingFile(File sourceFile, File outputDir, Progress progress) {
         Lexer gen = new Lexer(sourceFile);
         gen.parse();
 
@@ -60,8 +61,10 @@ public class Parser {
 
         List<String> extraTypes = parser.getReadyList().stream().map(node ->
                 parser.qualifiedTypeName(node.packageName, node.name)).collect(Collectors.toList());
+
         for (Node node : parser.getReadyList()) {
             Generator generator = new Generator(node, extraTypes, outputDir);
+            generator.listener(progress);
             generator.generate();
         }
     }
