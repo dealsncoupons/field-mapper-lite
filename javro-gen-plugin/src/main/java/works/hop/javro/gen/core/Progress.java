@@ -16,8 +16,9 @@ public class Progress {
 
     final File destDir;
     final String structClass = "org.apache.kafka.connect.data.Struct";
-    final String localCacheClass = "works.hop.upside.context.LocalCache";
-    final String dispatcherInterface = "works.hop.upside.entity.dispatcher.ChangeDispatcher";
+    final String localCacheClass = "works.hop.hydrate.jdbc.context.LocalCache";
+    final String changeConsumerClass = "works.hop.hydrate.jdbc.changes.ChangeConsumer";
+    final String dispatcherInterface = "works.hop.hydrate.jdbc.changes.ChangeDispatcher";
     final List<String> dispatchers = new ArrayList<>();
     final TypesMap typesMap = TypesMap.instance(); //important to use this shared instance
 
@@ -106,6 +107,7 @@ public class Progress {
             for (String dispatcherClassName : dispatchers) {
                 initCode.addStatement("this.dispatchers.add(new $L())", dispatcherClassName);
             }
+            initCode.addStatement("$T.getInstance().register(this)", typesMap.typeName(changeConsumerClass));
             initMethodBuilder.addCode(initCode.build());
             classBuilder.addMethod(initMethodBuilder.build());
 

@@ -74,7 +74,7 @@ public class Lexer {
     }
 
     public static void main(String[] args) {
-        Lexer gen = new Lexer("/model/ex1.avsc");
+        Lexer gen = new Lexer("/avro/ex1.avsc");
         gen.parse();
         System.out.println(gen.tokens);
     }

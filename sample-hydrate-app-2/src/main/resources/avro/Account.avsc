@@ -1,0 +1,48 @@
+{
+  "type": "record",
+  "namespace": "works.hop.sample2.hydrate.entity",
+  "name": "Account",
+  "annotations": [
+    "works.hop.hydrate.api.annotation.Table(\"tbl_account\")"
+  ],
+  "doc": "Account details",
+  "fields": [
+    {
+      "type": "java.util.UUID",
+      "name": "id",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Id"
+      ],
+      "doc": "The primary key identifier for the account"
+    },
+    {
+      "name": "username",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(\"user_name\")"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "password",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(\"access_code\")"
+      ],
+      "type": "string"
+    },
+    {
+      "name": "user",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.JoinColumn(value = \"user_id\", fkTable=\"tbl_user\")"
+      ],
+      "type": "works.hop.sample2.hydrate.entity.User"
+    },
+    {
+      "name": "dateCreated",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(value=\"date_created\", updatable=false)",
+        "works.hop.hydrate.api.annotation.Temporal"
+      ],
+      "type": "java.time.LocalDate"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+buildscript {
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath group: "works.hop", name: "javro-gen-plugin", version: "1.0-SNAPSHOT"
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+apply plugin: 'works.hop.javro-gen-plugin'
+
+group 'works.hop'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(":hydrate-entity-api")
+    implementation project(":hydrate-entity-jdbc")
+
+    implementation group: 'io.debezium', name: 'debezium-api', version: '1.5.2.Final'
+    implementation group: 'io.debezium', name: 'debezium-embedded', version: '1.5.2.Final'
+
+    compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    compileOnly group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
+
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.7.1'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.19.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+generateJavro({
+    sourceDir = file("src/main/resources/avro")
+    destDir = file("src/main/java")
+})
+
+sourceSets {
+    generated {
+        java.srcDirs "${buildDir}/generated-sources"
+    }
+    // set up a dependency for the main sourceSet on the generated sourceSet
+    main.compileClasspath += generated.output
+}

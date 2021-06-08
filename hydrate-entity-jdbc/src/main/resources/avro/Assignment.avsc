@@ -1,0 +1,41 @@
+{
+  "type": "record",
+  "namespace": "works.hop.hydrate.jdbc.entity",
+  "name": "Assignment",
+  "annotations": [
+    "works.hop.hydrate.api.annotation.Table(\"tbl_assignment\")"
+  ],
+  "doc": "Task assignment details",
+  "fields": [
+    {
+      "type": "java.util.UUID",
+      "name": "id",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Id"
+      ],
+      "doc": "The primary key identifier for the assignment"
+    },
+    {
+      "name": "task",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.JoinColumn(\"task_id\")"
+      ],
+      "type": "works.hop.hydrate.jdbc.entity.Task"
+    },
+    {
+      "name": "assignee",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.JoinColumn(\"assignee_id\")"
+      ],
+      "type": "works.hop.hydrate.jdbc.entity.User"
+    },
+    {
+      "name": "dateAssigned",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(\"date_assigned\")",
+        "works.hop.hydrate.api.annotation.Temporal"
+      ],
+      "type": "java.time.LocalDateTime"
+    }
+  ]
+}

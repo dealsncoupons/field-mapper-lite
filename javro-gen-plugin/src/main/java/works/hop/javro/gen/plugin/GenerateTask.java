@@ -20,7 +20,7 @@ public abstract class GenerateTask extends DefaultTask {
 
     @TaskAction
     public void generateJavro() {
-        File defaultSrcDir = Paths.get(getProject().getProjectDir().getPath()).resolve("src/main/resources/model").toFile();
+        File defaultSrcDir = Paths.get(getProject().getProjectDir().getPath()).resolve("src/main/resources/avro").toFile();
         File defaultDestDir = Paths.get(getProject().getProjectDir().getPath()).resolve("build/generated-sources/").toFile();
         File inputDir = getSourceDir().getOrElse(defaultSrcDir);
         File outputDir = getDestDir().getOrElse(defaultDestDir);
