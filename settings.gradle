@@ -1,0 +1,15 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'field-mapper-lite'
+include 'hydrate-entity-api'
+include 'hydrate-entity-jdbc'
+include 'hydrate-entity-plugin'
+include 'javro-entity-mapper'
+include 'sample-hydrate-app-1'
+include 'sample-hydrate-app-2'
+

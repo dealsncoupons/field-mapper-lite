@@ -1,0 +1,129 @@
+{
+  "type": "record",
+  "namespace": "works.hop.sample1.hydrate.entity",
+  "name": "Account",
+  "annotations": [
+    "works.hop.hydrate.api.annotation.Table(\"tbl_account\")"
+  ],
+  "fields": [
+    {
+      "name": "id",
+      "type": "java.util.UUID",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Id"
+      ]
+    },
+    {
+      "name": "dateCreated",
+      "type": "java.time.LocalDate",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(value=\"date_created\", updatable=false)",
+        "works.hop.hydrate.api.annotation.Temporal"
+      ]
+    },
+    {
+      "name": "lastUpdated",
+      "type": "java.time.LocalDateTime",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(\"last_updated\")",
+        "works.hop.hydrate.api.annotation.Temporal"
+      ]
+    },
+    {
+      "name": "username",
+      "type": "string"
+    },
+    {
+      "name": "accessCode",
+      "type": "string",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(\"access_code\")"
+      ]
+    },
+    {
+      "name": "member",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.JoinColumn(value=\"member_id\", fkTable=\"tbl_member\")"
+      ],
+      "type": {
+        "type": "record",
+        "annotations": [
+          "works.hop.hydrate.api.annotation.Table(\"tbl_member\")"
+        ],
+        "name": "Member",
+        "fields": [
+          {
+            "name": "id",
+            "type": "java.util.UUID",
+            "annotations": [
+              "works.hop.hydrate.api.annotation.Id"
+            ]
+          },
+          {
+            "name": "dateCreated",
+            "type": "java.time.LocalDate",
+            "annotations": [
+              "works.hop.hydrate.api.annotation.Column(value=\"date_created\", updatable=false)",
+              "works.hop.hydrate.api.annotation.Temporal"
+            ]
+          },
+          {
+            "name": "lastUpdated",
+            "type": "java.time.LocalDateTime",
+            "annotations": [
+              "works.hop.hydrate.api.annotation.Column(\"last_updated\")",
+              "works.hop.hydrate.api.annotation.Temporal"
+            ]
+          },
+          {
+            "name": "fullName",
+            "type": "string",
+            "annotations": [
+              "works.hop.hydrate.api.annotation.Column(\"full_name\")"
+            ]
+          },
+          {
+            "name": "emailAddr",
+            "type": "string",
+            "annotations": [
+              "works.hop.hydrate.api.annotation.Column(\"email_addr\")"
+            ]
+          },
+          {
+            "name": "address",
+            "annotations": [
+              "works.hop.hydrate.api.annotation.Embedded"
+            ],
+            "type": {
+              "type": "record",
+              "annotations": [
+                "works.hop.hydrate.api.annotation.Embeddable"
+              ],
+              "name": "Address",
+              "fields": [
+                {
+                  "name": "city",
+                  "type": "string"
+                },
+                {
+                  "name": "state",
+                  "type": "string",
+                  "annotations": [
+                    "works.hop.hydrate.api.annotation.Column(\"state_prov\")"
+                  ]
+                },
+                {
+                  "name": "zipCode",
+                  "type": "string",
+                  "annotations": [
+                    "works.hop.hydrate.api.annotation.Column(\"zip_code\")"
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

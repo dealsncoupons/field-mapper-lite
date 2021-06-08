@@ -1,0 +1,68 @@
+{
+  "type": "record",
+  "namespace": "works.hop.sample2.hydrate.entity",
+  "name": "Task",
+  "annotations": [
+    "works.hop.hydrate.api.annotation.Table(\"tbl_task\")"
+  ],
+  "doc": "Task details",
+  "fields": [
+    {
+      "type": "java.util.UUID",
+      "name": "id",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Id"
+      ],
+      "doc": "The primary key identifier for the task"
+    },
+    {
+      "type": "string",
+      "name": "name",
+      "doc": "The description of the task"
+    },
+    {
+      "type": "boolean",
+      "name": "completed",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(\"done\")"
+      ],
+      "doc": "Indicates whether the task is completed"
+    },
+    {
+      "type": "java.time.LocalDate",
+      "name": "dateCreated",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.Column(value=\"date_created\", updatable=false)",
+        "works.hop.hydrate.api.annotation.Temporal"
+      ],
+      "doc": "Date the task was created"
+    },
+    {
+      "type": "works.hop.sample2.hydrate.entity.Task",
+      "name": "nextTask",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.JoinColumn(value = \"next_task\", fkTable = \"tbl_task\")"
+      ],
+      "doc": "The scheduled next task's id"
+    },
+    {
+      "type": "works.hop.sample2.hydrate.entity.Task",
+      "name": "dependsOn",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.JoinColumn(value = \"parent_task\", fkTable = \"tbl_task\")"
+      ],
+      "doc": "This task's parent id"
+    },
+    {
+      "type": {
+        "type": "array",
+        "items": "works.hop.sample2.hydrate.entity.Task",
+      },
+      "name": "subTasks",
+      "annotations": [
+        "works.hop.hydrate.api.annotation.JoinColumn(value = \"parent_task\", fkTable = \"tbl_task\", manyToOne = true)"
+      ],
+      "doc": "Collection of parent ids belonging to the sub tasks"
+    }
+  ]
+}
